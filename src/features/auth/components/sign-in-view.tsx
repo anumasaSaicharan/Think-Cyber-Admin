@@ -11,7 +11,7 @@ import { useState } from 'react';
 import { X } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Authentication',
+  title: 'Authentication TK',
   description: 'Authentication forms built using the components.'
 };
 
@@ -26,14 +26,27 @@ export default function SignInViewPage({ stars }: { stars: number }) {
     setIsLoading(true);
 
     try {
+      console.log('Attempting to sign in with:', { email });
+      
       const result = await signIn('credentials', {
         email,
         password,
-        redirect: true,
+        redirect: false, // Change to false to handle redirect manually
         callbackUrl: '/dashboard/overview'
       });
+      
+      console.log('Sign in result:', result);
+      
+      if (result?.error) {
+        console.error('Authentication failed:', result.error);
+        alert('Authentication failed: ' + result.error);
+      } else if (result?.ok) {
+        console.log('Authentication successful, redirecting...');
+        window.location.href = '/dashboard/overview';
+      }
     } catch (error) {
-      // ...existing code...
+      console.error('Sign in error:', error);
+      alert('An error occurred during sign in');
     } finally {
       setIsLoading(false);
     }
@@ -71,7 +84,7 @@ export default function SignInViewPage({ stars }: { stars: number }) {
             </div>
 
             <h1 className='mb-2 text-2xl font-bold text-gray-900'>
-              Admin Login
+              Admin Login-KT
             </h1>
           </div>
 

@@ -1,3 +1,6 @@
+'use client';
+
+import React from 'react';
 import { MonthlyReport } from './monthly-report';
 
 export function RecentSales() {

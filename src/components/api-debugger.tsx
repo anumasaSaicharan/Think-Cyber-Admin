@@ -11,7 +11,7 @@ export function APIDebugger() {
 
   useEffect(() => {
     console.log('🔧 Environment Variables:');
-    console.log('NEXT_PUBLIC_API_BASE_URL:', process.env.NEXT_PUBLIC_API_BASE_URL);
+    console.log('NEXT_PUBLIC_API_BASE_URL:', "http://103.174.226.196/ThinkCyber/server/");
     
     // Test direct API call
     const testAPI = async () => {

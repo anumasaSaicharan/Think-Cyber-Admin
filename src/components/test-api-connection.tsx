@@ -7,15 +7,15 @@ export function TestAPIConnection() {
 
   useEffect(() => {
     // Log the API base URL to verify configuration
-    console.log('API Base URL:', process.env.NEXT_PUBLIC_API_BASE_URL);
-    console.log('Expected API call:', `${process.env.NEXT_PUBLIC_API_BASE_URL}/categories`);
+    console.log('API Base URL:', "https://api.thinkcyber.info/");
+    console.log('Expected API call:', `https://api.thinkcyber.info/api/categories`);
   }, []);
 
   if (loading) {
     return (
       <div>
         <p>Loading categories...</p>
-        <p>API Base URL: {process.env.NEXT_PUBLIC_API_BASE_URL}</p>
+        <p>API Base URL: {"https://api.thinkcyber.info/api/"}</p>
         <p>Check browser Network tab to see actual API calls</p>
       </div>
     );

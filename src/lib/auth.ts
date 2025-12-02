@@ -2,6 +2,7 @@ import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 
 export const authOptions: NextAuthOptions = {
+  debug: process.env.NODE_ENV === 'development',
   providers: [
     CredentialsProvider({
       name: "credentials",
@@ -10,12 +11,16 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
+        console.log("NextAuth authorize function called with:", credentials?.email);
+        
         if (!credentials?.email || !credentials?.password) {
+          console.log("Missing credentials");
           return null;
         }
 
         // Static credentials for demo purposes
         if (credentials.email === "admin_thinkcyber@gmail.com" && credentials.password === "admin123") {
+          console.log("Credentials match, returning user");
           return {
             id: "1",
             email: credentials.email,
@@ -23,6 +28,7 @@ export const authOptions: NextAuthOptions = {
           };
         }
 
+        console.log("Invalid credentials");
         return null;
       }
     })
@@ -33,6 +39,7 @@ export const authOptions: NextAuthOptions = {
   session: {
     strategy: "jwt",
   },
+  secret: "6b7f8e2c9a1d4e5f3c2b8a7d9e0f1c4b",
   callbacks: {
     async jwt({ token, user }) {
       if (user) {

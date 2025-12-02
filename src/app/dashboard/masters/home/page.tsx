@@ -21,7 +21,6 @@ import { toast } from '@/lib/toast';
 import { apiService } from '@/lib/api-service';
 import {
   HomepageContentResponse,
-  HomepageContentRequest,
   FAQRequest,
   FAQResponse,
   UpdateFAQRequest,
@@ -144,38 +143,41 @@ export default function HomePageMaster() {
     setError(null);
 
     try {
-      // Fetch homepage content via local API route
+      // Fetch homepage content via external API
       const result = await apiService.get('/homepage/en');
 
+      console.log('API Response:', result);
+      
       if (result.success && result.data) {
         const homepageData = result.data;
+        console.log('Homepage Data:', homepageData);
 
         // Transform API response to component state format
         const transformedData: HomepageContent = {
           hero: {
-            title: homepageData.hero.title || '',
-            subtitle: homepageData.hero.subtitle || '',
-            backgroundImage: homepageData.hero.backgroundImage || '',
-            ctaText: homepageData.hero.ctaText || '',
-            ctaLink: homepageData.hero.ctaLink || ''
+            title: homepageData.hero?.title || '',
+            subtitle: homepageData.hero?.subtitle || '',
+            backgroundImage: homepageData.hero?.backgroundImage || '',
+            ctaText: homepageData.hero?.ctaText || '',
+            ctaLink: homepageData.hero?.ctaLink || ''
           },
           about: {
-            title: homepageData.about.title || '',
-            content: homepageData.about.content || '',
-            image: homepageData.about.image || '',
-            features: homepageData.about.features || []
+            title: homepageData.about?.title || '',
+            content: homepageData.about?.content || '',
+            image: homepageData.about?.image || '',
+            features: homepageData.about?.features || []
           },
           contact: {
-            email: homepageData.contact.email || '',
-            phone: homepageData.contact.phone || '',
-            address: homepageData.contact.address || '',
-            hours: homepageData.contact.hours || '',
-            description: homepageData.contact.description || '',
-            supportEmail: homepageData.contact.supportEmail || '',
-            salesEmail: homepageData.contact.salesEmail || '',
-            socialLinks: homepageData.contact.socialLinks || {}
+            email: homepageData.contact?.email || '',
+            phone: homepageData.contact?.phone || '',
+            address: homepageData.contact?.address || '',
+            hours: homepageData.contact?.hours || '',
+            description: homepageData.contact?.description || '',
+            supportEmail: homepageData.contact?.supportEmail || '',
+            salesEmail: homepageData.contact?.salesEmail || '',
+            socialLinks: homepageData.contact?.socialLinks || {}
           },
-          faqs: homepageData.faqs.map((faq: any) => ({
+          faqs: (homepageData.faqs || []).map((faq: any) => ({
             id: faq.id || '',
             question: faq.question || '',
             answer: faq.answer || '',
@@ -283,7 +285,7 @@ export default function HomePageMaster() {
       formData.append('section', section);
       formData.append('field', field);
 
-      // Upload file to server using local API
+      // Upload file to server using external API
       const uploadResult = await apiService.post('/upload/image', formData);
 
       if (uploadResult.success && uploadResult.data?.url) {
@@ -490,31 +492,31 @@ export default function HomePageMaster() {
 
       console.log('Saving changes...');
 
-      // Prepare the request data according to API types
-      const requestData: HomepageContentRequest = {
+      // Prepare the request data to match the backend API structure (nested format as expected by validation)
+      const requestData = {
         language: 'en',
         hero: {
-          title: contentData.hero.title,
-          subtitle: contentData.hero.subtitle,
-          backgroundImage: contentData.hero.backgroundImage,
-          ctaText: contentData.hero.ctaText,
-          ctaLink: contentData.hero.ctaLink
+          title: contentData.hero.title || 'Default Hero Title',
+          subtitle: contentData.hero.subtitle || 'Default Hero Subtitle',
+          backgroundImage: contentData.hero.backgroundImage || null,
+          ctaText: contentData.hero.ctaText || null,
+          ctaLink: contentData.hero.ctaLink || null
         },
         about: {
-          title: contentData.about.title,
-          content: contentData.about.content,
-          image: contentData.about.image,
-          features: contentData.about.features
+          title: contentData.about.title || 'Default About Title',
+          content: contentData.about.content || 'Default About Content',
+          image: contentData.about.image || null,
+          features: contentData.about.features || []
         },
         contact: {
-          email: contentData.contact.email,
-          phone: contentData.contact.phone,
-          address: contentData.contact.address,
-          hours: contentData.contact.hours,
-          description: contentData.contact.description,
-          supportEmail: contentData.contact.supportEmail,
-          salesEmail: contentData.contact.salesEmail,
-          socialLinks: contentData.contact.socialLinks
+          email: contentData.contact.email || 'default@example.com',
+          phone: contentData.contact.phone || null,
+          address: contentData.contact.address || null,
+          hours: contentData.contact.hours || null,
+          description: contentData.contact.description || null,
+          supportEmail: contentData.contact.supportEmail || null,
+          salesEmail: contentData.contact.salesEmail || null,
+          socialLinks: contentData.contact.socialLinks || {}
         },
         faqs: contentData.faqs.map((faq: any) => ({
           id: faq.id,
@@ -525,8 +527,12 @@ export default function HomePageMaster() {
         }))
       };
 
-      // Send update request to API using the local endpoint for PUT method
+      console.log('Request data:', JSON.stringify(requestData, null, 2));
+
+      // Send update request to external API
       const result = await apiService.post('/homepage/content', requestData);
+      
+      console.log('Save result:', result);
 
       if (result.success) {
         console.log('Successfully saved data:', result.data);

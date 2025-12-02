@@ -18,7 +18,7 @@ export function UserNav() {
   const router = useRouter();
 
   const handleSignOut = () => {
-    signOut({ callbackUrl: '/auth/sign-in' });
+    signOut({ callbackUrl: '/auth/sign-in'});
   };
 
   if (session?.user) {
@@ -61,7 +61,7 @@ export function UserNav() {
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={handleSignOut}>
-            Sign Out
+            Sign Outt
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

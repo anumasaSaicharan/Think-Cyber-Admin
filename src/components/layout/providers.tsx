@@ -16,7 +16,7 @@ export default function Providers({
   return (
     <>
       <ActiveThemeProvider initialTheme={activeThemeValue}>
-        <SessionProvider>
+  <SessionProvider basePath="/api/auth">
           {children}
         </SessionProvider>
       </ActiveThemeProvider>

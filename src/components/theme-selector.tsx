@@ -1,6 +1,7 @@
 'use client';
 
 import { useThemeConfig } from '@/components/active-theme';
+import { useIsMounted } from '@/hooks/use-is-mounted';
 import { Label } from '@/components/ui/label';
 import {
   Select,
@@ -52,6 +53,25 @@ const MONO_THEMES = [
 
 export function ThemeSelector() {
   const { activeTheme, setActiveTheme } = useThemeConfig();
+  const isMounted = useIsMounted();
+
+  // Prevent hydration mismatch by not rendering Select until mounted
+  if (!isMounted) {
+    return (
+      <div className='flex items-center gap-2'>
+        <Label htmlFor='theme-selector' className='sr-only'>
+          Theme
+        </Label>
+        <div className='flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background'>
+          <span className='text-muted-foreground hidden sm:block'>
+            Select a theme:
+          </span>
+          <span className='text-muted-foreground block sm:hidden'>Theme</span>
+          <span>Loading...</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className='flex items-center gap-2'>

@@ -31,6 +31,7 @@ import {
 import { UserAvatarProfile } from '@/components/user-avatar-profile';
 import { navItems } from '@/constants/data';
 import { useMediaQuery } from '@/hooks/use-media-query';
+import { useIsMounted } from '@/hooks/use-is-mounted';
 import { useSession, signOut } from 'next-auth/react';
 import {
   IconBell,
@@ -63,6 +64,8 @@ export default function AppSidebar() {
   const { isOpen } = useMediaQuery();
   const { data: session } = useSession();
   const router = useRouter();
+  const isMounted = useIsMounted();
+  
   const handleSwitchTenant = (_tenantId: string) => {
     // Tenant switching functionality would be implemented here
   };
@@ -76,6 +79,37 @@ export default function AppSidebar() {
   React.useEffect(() => {
     // Side effects based on sidebar state changes
   }, [isOpen]);
+
+  // Don't render complex interactive elements until mounted to prevent hydration mismatches
+  if (!isMounted) {
+    return (
+      <Sidebar collapsible='icon'>
+        <SidebarHeader>
+          <div className='flex items-center gap-2 px-2 py-1'>
+            <div className='flex h-8 w-8 items-center justify-center rounded-lg bg-primary'>
+              <IconPhotoUp className='h-4 w-4 text-primary-foreground' />
+            </div>
+            <span className='font-semibold'>Loading...</span>
+          </div>
+        </SidebarHeader>
+        <SidebarContent className='overflow-x-hidden'>
+          <SidebarGroup>
+            <SidebarGroupLabel>Overview</SidebarGroupLabel>
+            <SidebarMenu>
+              {navItems.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton>
+                    <span>{item.title}</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroup>
+        </SidebarContent>
+        <SidebarRail />
+      </Sidebar>
+    );
+  }
 
   return (
     <Sidebar collapsible='icon'>

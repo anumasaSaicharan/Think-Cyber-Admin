@@ -1,5 +1,5 @@
 // API Base URL from environment variables
-export const API_BASE_URL = 'http://103.174.226.196/ThinkCyber/server/';
+export const API_BASE_URL = 'http://103.174.226.196/ThinkCyber/server/api';
 
 // API Endpoints Constants - These are relative to the base URL
 export const API_ENDPOINTS = {
@@ -127,9 +127,16 @@ export const API_ENDPOINTS = {
     USERS: {
         BASE: 'users',
         BY_ID: (id: string | number) => `users/${id}`,
+        LIST: 'users/list',
+        STATS: 'users/stats',
         PROFILE: 'users/profile',
         BULK_DELETE: 'users/bulk-delete',
+        BULK_UPDATE: 'users/bulk-update',
         SEARCH: 'users/search',
+        ENROLLMENTS: (id: string | number) => `users/${id}/enrollments`,
+        PROGRESS: (id: string | number) => `users/${id}/progress`,
+        EXPORT: 'users/export',
+        IMPORT: 'users/import',
     },
 
     // Dashboard endpoints
@@ -137,6 +144,11 @@ export const API_ENDPOINTS = {
         OVERVIEW: 'dashboard/overview',
         STATS: 'dashboard/stats',
         ANALYTICS: 'dashboard/analytics',
+        EARNINGS: 'dashboard/earnings',
+        PROGRESS_MONTHLY: 'dashboard/progress/monthly',
+        REPORT_MONTHLY: 'dashboard/reports/monthly',
+        UPDATES: 'dashboard/updates',
+        ANALYTICS_USERS: 'dashboard/analytics/users',
     },
 
     // Reports endpoints
