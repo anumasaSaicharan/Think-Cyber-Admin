@@ -13,8 +13,10 @@ interface Category {
   id?: number;
   name: string;
   description: string;
+  price: number;
   status: 'Active' | 'Draft' | 'Inactive';
 }
+
 
 interface CategoryModalProps {
   isOpen: boolean;
@@ -34,6 +36,7 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
   const [formData, setFormData] = useState<Category>({
     name: '',
     description: '',
+    price:0,
     status: 'Active'
   });
   
@@ -41,27 +44,31 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Reset form when modal opens/closes or category changes
-  useEffect(() => {
-    if (isOpen) {
-      if (category) {
-        // Edit mode
-        setFormData({
-          id: category.id,
-          name: category.name || '',
-          description: category.description || '',
-          status: category.status || 'Active'
-        });
-      } else {
-        // Add mode
-        setFormData({
-          name: '',
-          description: '',
-          status: 'Active'
-        });
-      }
-      setErrors({});
+ useEffect(() => {
+  if (isOpen) {
+    if (category) {
+      // Edit mode
+      setFormData({
+        id: category.id,
+        name: category.name || '',
+        description: category.description || '',
+        price: category.price || 0,
+        status: category.status || 'Active',
+      });
+    } else {
+      // Add mode
+      setFormData({
+        name: '',
+        description: '',
+        price: 0,
+        status: 'Active',
+      });
     }
-  }, [isOpen, category]);
+
+    setErrors({});
+  }
+}, [isOpen, category]);
+
 
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
@@ -76,6 +83,10 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
       newErrors.description = 'Description is required';
     } else if (formData.description.length < 10) {
       newErrors.description = 'Description must be at least 10 characters';
+    }
+
+    if (formData.price < 0) {
+      newErrors.price = 'Price must be a positive number';
     }
 
     if (!formData.status) {
@@ -166,6 +177,31 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
             <p className="text-sm text-red-500">{errors.description}</p>
           )}
         </div>
+
+       {/* Price */}
+        <div className="space-y-2">
+          <Label htmlFor="category-price">Price ₹ *</Label>
+          <Input
+            id="category-price"
+            type="number"
+            min="0"
+            step="1"
+            value={formData.price}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (value === '' || /^\d+$/.test(value)) {
+                handleInputChange('price', value);
+              }
+            }}
+            placeholder="Enter price"
+            className={errors.price ? 'border-red-500' : ''}
+            disabled={isSubmitting}
+          />
+          {errors.price && (
+            <p className="text-sm text-red-500">{errors.price}</p>
+          )}
+        </div>
+
 
         {/* Status */}
         <div className="space-y-2">

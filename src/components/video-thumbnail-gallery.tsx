@@ -99,7 +99,7 @@ export function VideoThumbnailGallery({
 
   if (videos.length === 0) {
     return (
-      <div className="text-center py-8 bg-gray-50 rounded-lg border border-dashed border-gray-300">
+      <div className="text-center py-8 bg-accent rounded-lg border border-dashed border-gray-300">
         <Video className="h-12 w-12 mx-auto text-gray-400 mb-3" />
         <h3 className="text-lg font-medium text-gray-900 mb-2">No videos yet</h3>
         <p className="text-gray-500">

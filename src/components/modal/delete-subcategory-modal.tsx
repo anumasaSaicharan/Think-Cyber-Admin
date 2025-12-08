@@ -65,7 +65,7 @@ export const DeleteSubCategoryModal: React.FC<DeleteSubCategoryModalProps> = ({
         </div>
 
         {/* Confirmation Details */}
-        <div className="bg-gray-50 p-4 rounded-lg">
+        <div className="bg-accent p-4 rounded-lg">
           <p className="text-sm text-gray-600">
             This will permanently delete the sub-category and may affect related content. 
             Make sure you have backed up any important data.

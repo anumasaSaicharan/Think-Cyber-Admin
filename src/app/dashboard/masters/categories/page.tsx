@@ -20,6 +20,7 @@ interface Category {
   name: string;
   description: string;
   topicsCount: number;
+  price:number;
   status: 'Active' | 'Draft' | 'Inactive';
   createdAt: string;
   updatedAt?: string;
@@ -305,7 +306,7 @@ export default function CategoriesPage() {
             ) : (
               <div className='space-y-4'>
                 {categories.map((category) => (
-                  <div key={category.id} className='flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50'>
+                  <div key={category.id} className='flex items-center justify-between p-4 border border-border rounded-lg hover:bg-accent'>
                     <div className='flex items-center space-x-4'>
                       <div className='p-2 bg-blue-100 rounded-lg'>
                         <FolderOpen className='h-6 w-6 text-blue-600' />
@@ -313,6 +314,7 @@ export default function CategoriesPage() {
                       <div>
                         <p className='font-medium'>{category.name}</p>
                         <p className='text-sm text-muted-foreground'>{category.description}</p>
+                        <p className='text-sm text-muted-foreground'>Price:{category.price} ₹</p>
                         <p className='text-xs text-muted-foreground'>
                           Created: {category.createdAt ? formatDate(category.createdAt, { 
                             month: 'short', 

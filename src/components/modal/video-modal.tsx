@@ -107,7 +107,7 @@ export const VideoModal: React.FC<VideoModalProps> = ({
           {video.transcript && (
             <div>
               <h4 className="font-medium mb-2">Transcript</h4>
-              <div className="bg-gray-50 p-3 rounded-lg max-h-32 overflow-y-auto text-sm text-muted-foreground">
+              <div className="bg-accent p-3 rounded-lg max-h-32 overflow-y-auto text-sm text-muted-foreground">
                 {video.transcript}
               </div>
             </div>

@@ -49,7 +49,7 @@ export function DashboardApiStatus() {
       case 'error':
         return 'bg-red-50 text-red-600 border-red-200';
       default:
-        return 'bg-gray-50 text-gray-600 border-gray-200';
+        return 'bg-accent text-gray-600 border-gray-200';
     }
   };
 

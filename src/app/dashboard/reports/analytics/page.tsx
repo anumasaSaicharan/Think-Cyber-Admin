@@ -1,11 +1,74 @@
+'use client';
+
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import PageContainer from '@/components/layout/page-container';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { TrendingUp, Users, BookOpen, Clock, Download } from 'lucide-react';
+import { useState, useEffect } from 'react';
 
 export default function AnalyticsPage() {
+  const [period, setPeriod] = useState('7d');
+  const [metrics, setMetrics] = useState({
+    totalUsers: 0,
+    activeLeamers: 0,
+    avgSessionTime: '0m 0s',
+    completionRate: '0%',
+    growth: 0,
+    learnerGrowth: 0,
+    sessionGrowth: 0,
+    completionGrowth: 0
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchMetrics();
+  }, [period]);
+
+  const fetchMetrics = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch(`/api/users/stats?period=${period}`);
+      if (res.ok) {
+        const data = await res.json();
+        setMetrics({
+          totalUsers: data.totalUsers || 0,
+          activeLeamers: data.activeLeamers || 0,
+          avgSessionTime: data.avgSessionTime || '0m 0s',
+          completionRate: data.completionRate || '0%',
+          growth: data.growth || 0,
+          learnerGrowth: data.learnerGrowth || 0,
+          sessionGrowth: data.sessionGrowth || 0,
+          completionGrowth: data.completionGrowth || 0
+        });
+      }
+    } catch (error) {
+      console.error('Failed to fetch metrics:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleExportReport = async () => {
+    try {
+      const res = await fetch(`/api/reports/export?period=${period}`);
+      if (res.ok) {
+        const blob = await res.blob();
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `analytics-report-${period}.csv`;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.URL.revokeObjectURL(url);
+      }
+    } catch (error) {
+      console.error('Failed to export report:', error);
+    }
+  };
+
   return (
     <PageContainer>
       <div className='space-y-4'>
@@ -13,13 +76,13 @@ export default function AnalyticsPage() {
         
         <div className='flex items-center justify-between'>
           <div>
-            <h1 className='text-3xl font-bold tracking-tight'>User Analytics</h1>
+            <h1 className='text-3xl font-bold tracking-tight dark:text-white'>User Analytics</h1>
             <p className='text-muted-foreground'>
               Comprehensive analytics and insights about user behavior
             </p>
           </div>
           <div className='flex space-x-2'>
-            <Select>
+            <Select value={period} onValueChange={setPeriod}>
               <SelectTrigger className='w-[180px]'>
                 <SelectValue placeholder='Select period' />
               </SelectTrigger>
@@ -30,7 +93,7 @@ export default function AnalyticsPage() {
                 <SelectItem value='1y'>Last year</SelectItem>
               </SelectContent>
             </Select>
-            <Button>
+            <Button onClick={handleExportReport} disabled={loading}>
               <Download className='mr-2 h-4 w-4' />
               Export Report
             </Button>
@@ -45,9 +108,9 @@ export default function AnalyticsPage() {
               <Users className='h-4 w-4 text-muted-foreground' />
             </CardHeader>
             <CardContent>
-              <div className='text-2xl font-bold'>12,451</div>
+              <div className='text-2xl font-bold'>{metrics.totalUsers.toLocaleString()}</div>
               <p className='text-xs text-muted-foreground'>
-                <span className='text-green-600'>+15.2%</span> from last month
+                <span className='text-green-600'>+{metrics.growth}%</span> from last period
               </p>
             </CardContent>
           </Card>
@@ -58,9 +121,9 @@ export default function AnalyticsPage() {
               <BookOpen className='h-4 w-4 text-muted-foreground' />
             </CardHeader>
             <CardContent>
-              <div className='text-2xl font-bold'>8,924</div>
+              <div className='text-2xl font-bold'>{metrics.activeLeamers.toLocaleString()}</div>
               <p className='text-xs text-muted-foreground'>
-                <span className='text-green-600'>+8.7%</span> from last month
+                <span className='text-green-600'>+{metrics.learnerGrowth}%</span> from last period
               </p>
             </CardContent>
           </Card>
@@ -71,9 +134,9 @@ export default function AnalyticsPage() {
               <Clock className='h-4 w-4 text-muted-foreground' />
             </CardHeader>
             <CardContent>
-              <div className='text-2xl font-bold'>24m 35s</div>
+              <div className='text-2xl font-bold'>{metrics.avgSessionTime}</div>
               <p className='text-xs text-muted-foreground'>
-                <span className='text-green-600'>+12.4%</span> from last month
+                <span className='text-green-600'>+{metrics.sessionGrowth}%</span> from last period
               </p>
             </CardContent>
           </Card>
@@ -84,9 +147,9 @@ export default function AnalyticsPage() {
               <TrendingUp className='h-4 w-4 text-muted-foreground' />
             </CardHeader>
             <CardContent>
-              <div className='text-2xl font-bold'>78.9%</div>
+              <div className='text-2xl font-bold'>{metrics.completionRate}</div>
               <p className='text-xs text-muted-foreground'>
-                <span className='text-green-600'>+3.2%</span> from last month
+                <span className='text-green-600'>+{metrics.completionGrowth}%</span> from last period
               </p>
             </CardContent>
           </Card>

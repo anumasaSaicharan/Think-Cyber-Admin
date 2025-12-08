@@ -225,7 +225,7 @@ export default function UsersPage() {
                 Array.from({ length: 5 }).map((_, index) => (
                   <div
                     key={index}
-                    className='flex items-center justify-between rounded-lg border p-4'
+                    className='flex items-center justify-between rounded-lg border border-border p-4'
                   >
                     <div className='flex items-center space-x-4'>
                       <Skeleton className="h-10 w-10 rounded-full" />
@@ -247,7 +247,7 @@ export default function UsersPage() {
                 users.users.map((user) => (
                   <div
                     key={user.id}
-                    className='flex items-center justify-between rounded-lg border p-4 hover:bg-gray-50'
+                    className='flex items-center justify-between rounded-lg border border-border p-4 hover:bg-accent'
                   >
                     <div className='flex items-center space-x-4'>
                       <Avatar>

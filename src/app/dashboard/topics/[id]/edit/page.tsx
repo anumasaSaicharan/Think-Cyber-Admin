@@ -2161,7 +2161,7 @@ export default function EditTopicPage() {
                             }`}
                           >
                             <CollapsibleTrigger asChild>
-                              <CardHeader className='h-[50px] min-h-[50px] cursor-pointer px-3 py-2 transition-colors hover:bg-gray-50/50'>
+                              <CardHeader className='h-[50px] min-h-[50px] cursor-pointer px-3 py-2 transition-colors hover:bg-accent/50'>
                                 <div className='flex h-full items-center justify-between'>
                                   <div className='flex items-center gap-2'>
                                     <div
@@ -2325,7 +2325,7 @@ export default function EditTopicPage() {
                                     </div>
 
                                     {module.videos.length === 0 ? (
-                                      <div className='rounded-lg border border-dashed border-gray-300 bg-gray-50 py-2 text-center'>
+                                      <div className='rounded-lg border border-dashed border-gray-300 bg-accent py-2 text-center'>
                                         <PlayCircle className='mx-auto mb-2 h-8 w-8 text-gray-400' />
                                         <h6 className='mb-1 text-sm font-medium text-gray-900'>
                                           No videos yet

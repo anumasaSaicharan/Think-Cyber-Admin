@@ -1367,7 +1367,7 @@ export default function NewTopicPage() {
                       >
                         <Card className="border-2 transition-all py-1 border-gray-200 hover:border-gray-300">
                           <CollapsibleTrigger asChild>
-                            <CardHeader className="cursor-pointer hover:bg-gray-50/50 transition-colors py-2 px-3 h-[50px] min-h-[50px]">
+                            <CardHeader className="cursor-pointer hover:bg-accent/50 transition-colors py-2 px-3 h-[50px] min-h-[50px]">
                               <div className="flex items-center justify-between h-full">
                                 <div className="flex items-center gap-2">
                                   <div className="w-6 h-6 rounded flex items-center justify-center text-xs font-semibold bg-gray-100 text-gray-600">
@@ -1477,7 +1477,7 @@ export default function NewTopicPage() {
                                   </div>
 
                                   {module.videos.length === 0 ? (
-                                    <div className="text-center py-2 bg-gray-50 rounded-lg border border-dashed border-gray-300">
+                                    <div className="text-center py-2 bg-accent rounded-lg border border-dashed border-gray-300">
                                       <PlayCircle className="h-8 w-8 mx-auto text-gray-400 mb-2" />
                                       <h6 className="text-sm font-medium text-gray-900 mb-1">No videos yet</h6>
                                       <p className="text-gray-500 text-xs mb-3">Upload videos or add video links</p>

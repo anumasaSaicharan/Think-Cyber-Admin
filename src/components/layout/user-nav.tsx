@@ -61,7 +61,7 @@ export function UserNav() {
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={handleSignOut}>
-            Sign Outt
+            
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

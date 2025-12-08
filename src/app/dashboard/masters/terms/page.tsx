@@ -250,7 +250,7 @@ export default function TermsPage() {
           <Card>
             <CardContent className='p-6'>
               <div className='flex items-center space-x-2'>
-                <div className='h-2 w-2 bg-gray-500 rounded-full' />  
+                <div className='h-2 w-2 bg-accent0 rounded-full' />  
                 <div>
                   <p className='text-sm font-medium text-muted-foreground'>Archived</p>
                   <p className='text-2xl font-bold'>{stats.archived}</p>
@@ -362,7 +362,7 @@ export default function TermsPage() {
             ) : (
               <div className='space-y-4'>
                 {terms && terms.length > 0 && terms.map((termItem) => (
-                  <div key={termItem.id} className='flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50'>
+                  <div key={termItem.id} className='flex items-center justify-between p-4 border rounded-lg hover:bg-accent'>
                     <div className='flex items-center space-x-4'>
                       <div className='p-2 bg-blue-100 rounded-lg'>
                         <FileText className='h-6 w-6 text-blue-600' />

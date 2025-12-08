@@ -333,7 +333,7 @@ export function RichTextEditor({
           
           if (!headerProcessed) {
             // First row is header
-            tableHtml += '<thead class="bg-gray-50"><tr>';
+            tableHtml += '<thead class="bg-accent"><tr>';
             cells.forEach(cell => {
               const cellContent = cell
                 .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
@@ -344,7 +344,7 @@ export function RichTextEditor({
             headerProcessed = true;
           } else {
             // Data rows
-            tableHtml += '<tr class="hover:bg-gray-50">';
+            tableHtml += '<tr class="hover:bg-accent">';
             cells.forEach(cell => {
               const cellContent = cell
                 .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
@@ -378,7 +378,7 @@ export function RichTextEditor({
   return (
     <div className={cn("border rounded-lg", className)}>
       {/* Toolbar */}
-      <div className="flex items-center gap-1 p-2 border-b bg-gray-50 rounded-t-lg">
+      <div className="flex items-center gap-1 p-2 border-b bg-accent rounded-t-lg">
         <Button
           type="button"
           variant="ghost"

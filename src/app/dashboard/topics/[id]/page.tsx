@@ -515,7 +515,7 @@ export default function TopicDetailsPage() {
                   >
                     <Card className="border-2">
                       <CollapsibleTrigger asChild>
-                        <CardHeader className="cursor-pointer hover:bg-gray-50 transition-colors">
+                        <CardHeader className="cursor-pointer hover:bg-accent transition-colors">
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
                               <Badge variant="outline" className="text-sm">
@@ -598,7 +598,7 @@ export default function TopicDetailsPage() {
                                 </div>
                               </div>
                             ) : (
-                              <div className="text-center py-6 bg-gray-50 rounded-lg border-2 border-dashed">
+                              <div className="text-center py-6 bg-accent rounded-lg border-2 border-dashed">
                                 <PlayCircle className="h-8 w-8 mx-auto text-gray-400 mb-2" />
                                 <p className="text-gray-500 text-sm">No videos in this module</p>
                               </div>

@@ -478,7 +478,7 @@ export default function TopicsPage() {
             ) : (
               <div className='space-y-4'>
                 {topics.map((topic) => (
-                  <div key={topic.id} className='flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50'>
+                  <div key={topic.id} className='flex items-center justify-between p-4 border rounded-lg hover:bg-accent dark:hover:bg-gray-800'>
                     <div className='flex items-center space-x-4'>
                       <div className='p-2 bg-blue-100 rounded-lg'>
                         <span className='text-2xl'>{topic.emoji || '📚'}</span>

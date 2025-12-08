@@ -228,7 +228,7 @@ export function VideoUpload({
               />
               <Label
                 htmlFor={`video-file-${video.id}`}
-                className="flex items-center justify-center h-7 px-2 text-xs border border-dashed rounded-md cursor-pointer hover:bg-gray-50 transition-colors"
+                className="flex items-center justify-center h-7 px-2 text-xs border border-dashed rounded-md cursor-pointer hover:bg-accent transition-colors"
               >
                 <Upload className="h-3 w-3 mr-1" />
                 {video.videoFile ? (

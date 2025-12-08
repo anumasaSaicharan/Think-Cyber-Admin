@@ -966,7 +966,7 @@ export default function HomePageMaster() {
                 <CardContent className='space-y-4'>
                   {/* Add New FAQ Form */}
                   {isAddingFaq && (
-                    <div className='rounded-lg border bg-gray-50 p-4'>
+                    <div className='rounded-lg border bg-accent p-4'>
                       <div className='space-y-4'>
                         <div>
                           <Label htmlFor='new-faq-question'>Question</Label>

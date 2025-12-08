@@ -398,7 +398,7 @@ export default function PrivacyPage() {
                   {privacyPolicies.map((privacy) => (
                     <div
                       key={privacy.id}
-                      className='flex items-center justify-between rounded-lg border p-4 hover:bg-gray-50'
+                      className='flex items-center justify-between rounded-lg border border-border p-4 hover:bg-accent'
                     >
                       <div className='flex items-center space-x-4'>
                         <div className='rounded-lg bg-blue-100 p-2'>

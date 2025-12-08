@@ -42,7 +42,7 @@ export function DeleteTermsModal({ isOpen, onClose, onConfirm, termsTitle }: Del
           <p className='text-sm text-muted-foreground mb-4'>
             Are you sure you want to delete the following terms and conditions? This action cannot be undone.
           </p>
-          <div className='bg-gray-50 p-3 rounded-lg'>
+          <div className='bg-accent p-3 rounded-lg'>
             <p className='font-medium text-sm'>{termsTitle}</p>
           </div>
         </div>
