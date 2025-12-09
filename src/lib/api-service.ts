@@ -178,6 +178,51 @@ class ApiService {
     return this.makeRequest<T>(endpoint, { ...config, method: 'DELETE' });
   }
 
+  // Download blob (for file downloads)
+  async downloadBlob(
+    endpoint: string,
+    config?: Omit<ApiRequestConfig, 'method' | 'body'>
+  ): Promise<ApiResponse<Blob>> {
+    try {
+      const url = buildUrl(endpoint, config?.params);
+      
+      const headers: Record<string, string> = {
+        ...this.defaultHeaders,
+        ...config?.headers,
+        'Accept': 'text/csv, application/csv, */*',
+      };
+
+      const response = await fetch(url, {
+        method: 'GET',
+        headers,
+        credentials: 'include',
+        mode: 'cors',
+        signal: AbortSignal.timeout(30000),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Download failed:', response.status, errorText);
+        return {
+          success: false,
+          error: `Failed to download: ${response.status} ${response.statusText}`
+        };
+      }
+
+      const blob = await response.blob();
+      return {
+        success: true,
+        data: blob
+      };
+    } catch (error) {
+      console.error('Download error:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Download failed'
+      };
+    }
+  }
+
   // Deprecated methods - keeping for backward compatibility
   setBaseUrl(): void {
     // ...existing code...

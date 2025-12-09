@@ -83,7 +83,13 @@ export interface MonthlyProgress {
   achieved?: number;
 }
 
-export interface MonthlyReport {
+export interface MonthlyReport { 
+  totalPaymentTransactions?: number;
+  segment?: string;
+  totalTopics: number;
+  totalEnrolled: number;
+  totalSubscribed: number;
+  totalEarnings?: number;
   totalSubscriptions?: number;
   newSubscriptions?: number;
   cancelledSubscriptions?: number;
@@ -107,33 +113,21 @@ export interface MonthlyReport {
 }
 
 export interface UserUpdates {
-  totalUpdates?: number;
-  recentUpdates?: {
-    id: string;
-    userId: string;
-    userName: string;
-    action: 'enrollment' | 'completion' | 'subscription' | 'cancellation';
-    topicTitle?: string;
-    timestamp: string;
-  }[];
-  enrolled?: {
-    id: number;
-    name: string;
-    status: string;
-    location: string;
-    avatar: string;
-    enrolledAt: string;
-    topicTitle: string;
-  }[];
-  subscribed?: {
-    id: number;
-    name: string;
-    email: string;
-    subscription: string;
-    status: string;
-    joinDate: string;
-    avatar: string;
-  }[];
+  data: Array<any>;
+  pagination?: {
+    currentPage: number;
+    totalPages: number;
+    totalCount: number;
+    limit: number;
+    hasNextPage: boolean;
+    hasPrevPage: boolean;
+  };
+  filters?: {
+    tab: string;
+    month: string | null;
+    fromDate: string | null;
+    toDate: string | null;
+  };
 }
 
 export interface UserAnalytics {
@@ -200,10 +194,12 @@ class DashboardApiService {
   }
 
   // Fetch dashboard earnings data
-  async getEarningsData(): Promise<ApiResponse<DashboardEarnings>> {
+  async getEarningsData(year?: number): Promise<ApiResponse<DashboardEarnings>> {
     try {
+      // Use current year if not provided
+      const selectedYear = year || new Date().getFullYear();
       const response = await apiService.get<DashboardEarnings>(
-        API_ENDPOINTS.DASHBOARD.EARNINGS
+        API_ENDPOINTS.DASHBOARD.EARNINGS(String(selectedYear))
       );
       return response;
     } catch (error) {
@@ -219,7 +215,7 @@ class DashboardApiService {
   async getMonthlyProgress(): Promise<ApiResponse<MonthlyProgress>> {
     try {
       const response = await apiService.get<MonthlyProgress>(
-        API_ENDPOINTS.DASHBOARD.PROGRESS_MONTHLY
+        API_ENDPOINTS.DASHBOARD.REPORT_MONTHLY
       );
       return response;
     } catch (error) {
@@ -232,11 +228,16 @@ class DashboardApiService {
   }
 
   // Fetch monthly report data
-  async getMonthlyReport(): Promise<ApiResponse<MonthlyReport>> {
+  async getMonthlyReport(params?: { segment: string; month: string }): Promise<ApiResponse<MonthlyReport>> {
     try {
-      const response = await apiService.get<MonthlyReport>(
-        API_ENDPOINTS.DASHBOARD.REPORT_MONTHLY
-      );
+      // Use default values if params not provided
+      const segment = params?.segment || 'earnings';
+      const now = new Date();
+      const month = params?.month || `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+      
+      const endpoint = API_ENDPOINTS.DASHBOARD.REPORT_MONTHLY_NEW(segment, month);
+      console.log('Fetching monthly report from endpoint:', endpoint);
+      const response = await apiService.get<MonthlyReport>(endpoint);
       return response;
     } catch (error) {
       console.error('Error fetching monthly report:', error);
@@ -247,12 +248,55 @@ class DashboardApiService {
     }
   }
 
-  // Fetch user updates data
-  async getUserUpdates(): Promise<ApiResponse<UserUpdates>> {
+  // Fetch monthly report data for download
+  async getMonthlyReportDownload(params?: { segment: string; month: string }): Promise<ApiResponse<Blob>> {
     try {
-      const response = await apiService.get<UserUpdates>(
-        API_ENDPOINTS.DASHBOARD.UPDATES
-      );
+      const segment = params?.segment || 'earnings';
+      const now = new Date();
+      const month = params?.month || `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+      
+      const endpoint = `${API_ENDPOINTS.DASHBOARD.REPORT_MONTHLY_NEW(segment, month)}&download=true`;
+      console.log('Downloading report from endpoint:', endpoint);
+      
+      const response = await apiService.downloadBlob(endpoint);
+      return response;
+    } catch (error) {
+      console.error('Error downloading monthly report:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to download monthly report'
+      };
+    }
+  }
+
+  // Fetch user updates data with optional filters
+  async getUserUpdates(params?: {
+    tab?: 'enrolled' | 'subscription';
+    month?: string; // YYYY-MM format
+    fromDate?: string; // YYYY-MM-DD format
+    toDate?: string; // YYYY-MM-DD format
+    page?: number;
+    limit?: number;
+  }): Promise<ApiResponse<UserUpdates>> {
+    try {
+      // Build query parameters
+      const queryParams: Record<string, string> = {};
+      
+      if (params?.tab) queryParams.tab = params.tab;
+      if (params?.month) queryParams.month = params.month;
+      if (params?.fromDate) queryParams.fromDate = params.fromDate;
+      if (params?.toDate) queryParams.toDate = params.toDate;
+      if (params?.page) queryParams.page = params.page.toString();
+      if (params?.limit) queryParams.limit = params.limit.toString();
+
+      // Build URL with query parameters
+      const queryString = Object.keys(queryParams).length > 0
+        ? `?${new URLSearchParams(queryParams).toString()}`
+        : '';
+      
+      const endpoint = `${API_ENDPOINTS.DASHBOARD.UPDATES}${queryString}`;
+      
+      const response = await apiService.get<UserUpdates>(endpoint);
       return response;
     } catch (error) {
       console.error('Error fetching user updates:', error);

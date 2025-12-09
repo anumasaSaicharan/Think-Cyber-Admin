@@ -1,5 +1,5 @@
 // API Base URL from environment variables
-export const API_BASE_URL = 'http://103.174.226.196/ThinkCyber/server/api';
+export const API_BASE_URL = 'http://localhost:8081/api';
 
 // API Endpoints Constants - These are relative to the base URL
 export const API_ENDPOINTS = {
@@ -144,11 +144,13 @@ export const API_ENDPOINTS = {
         OVERVIEW: 'dashboard/overview',
         STATS: 'dashboard/stats',
         ANALYTICS: 'dashboard/analytics',
-        EARNINGS: 'dashboard/earnings',
+        EARNINGS: (year: string) => `dashboard/earnings?year=${year}`,
         PROGRESS_MONTHLY: 'dashboard/progress/monthly',
         REPORT_MONTHLY: 'dashboard/reports/monthly',
+        REPORT_MONTHLY_NEW: (segment: string ,month: string) => `dashboard/reports/monthlyReport?segment=${segment}&month=${month}`,
         UPDATES: 'dashboard/updates',
         ANALYTICS_USERS: 'dashboard/analytics/users',
+        REPORT_DOWNLOAD: (segment: string ,month: string) => `dashboard/reports/download?segment=${segment}&month=${month}`,
     },
 
     // Reports endpoints
@@ -166,6 +168,19 @@ export const API_ENDPOINTS = {
         CONTENT: 'homepage/content',
         FAQS: 'homepage/faqs',
         FAQ_BY_ID: (id: string) => `homepage/faqs/${id}`,
+    },
+
+    // Combo Topics endpoints
+    COMBO_TOPICS: {
+        BASE: 'combo-topics',
+        BY_ID: (id: string | number) => `combo-topics/${id}`,
+        BY_CATEGORY: (categoryId: string | number) => `combo-topics/category/${categoryId}`,
+        CREATE: 'combo-topics',
+        UPDATE: (id: string | number) => `combo-topics/${id}`,
+        DELETE: (id: string | number) => `combo-topics/${id}`,
+        BULK_DELETE: 'combo-topics/bulk-delete',
+        VALIDATE_COUPON: 'combo-topics/validate-coupon',
+        STATS: 'combo-topics/stats',
     },
 } as const;
 
