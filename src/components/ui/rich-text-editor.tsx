@@ -312,12 +312,40 @@ export function RichTextEditor({
   const renderPreview = (text: string) => {
     let html = text;
     
-    // First, handle tables before other formatting
+    // Check if content contains HTML tags (ordered/unordered lists, strong, em, etc.)
+    const hasHtmlTags = /<(ol|ul|li|strong|em|p|br|table|thead|tbody|tr|th|td|h[1-6])[^>]*>/i.test(text);
+    
+    if (hasHtmlTags) {
+      // Content already contains HTML, just enhance the styling
+      html = text
+        // Add classes to ordered lists
+        .replace(/<ol>/gi, '<ol class="list-decimal list-inside space-y-2 my-4 ml-4">')
+        .replace(/<ol([^>]*)>/gi, '<ol$1 class="list-decimal list-inside space-y-2 my-4 ml-4">')
+        // Add classes to unordered lists
+        .replace(/<ul>/gi, '<ul class="list-disc list-inside space-y-2 my-4 ml-4">')
+        .replace(/<ul([^>]*)>/gi, '<ul$1 class="list-disc list-inside space-y-2 my-4 ml-4">')
+        // Add classes to list items
+        .replace(/<li>/gi, '<li class="ml-2 py-1 text-gray-700">')
+        .replace(/<li([^>]*)>/gi, '<li$1 class="ml-2 py-1 text-gray-700">')
+        // Add classes to strong tags
+        .replace(/<strong>/gi, '<strong class="font-semibold text-gray-900">')
+        .replace(/<strong([^>]*)>/gi, '<strong$1 class="font-semibold text-gray-900">')
+        // Add classes to em tags
+        .replace(/<em>/gi, '<em class="italic text-gray-700">')
+        .replace(/<em([^>]*)>/gi, '<em$1 class="italic text-gray-700">')
+        // Add classes to paragraphs
+        .replace(/<p>/gi, '<p class="mb-3 text-gray-700">')
+        .replace(/<p([^>]*)>/gi, '<p$1 class="mb-3 text-gray-700">');
+      
+      return html;
+    }
+    
+    // First, handle tables before other formatting (for markdown tables)
     html = html.replace(/(\|[^|\n]*\|[\s\S]*?)(?=\n\n|\n$|$)/g, (match) => {
       const lines = match.trim().split('\n');
       if (lines.length < 2) return match;
       
-      let tableHtml = '<table class="table-auto border-collapse border border-gray-300 my-4 w-full">';
+      let tableHtml = '<table class="border-collapse border border-gray-300 my-4 w-full shadow-sm">';
       let headerProcessed = false;
       
       lines.forEach((line, index) => {
@@ -333,23 +361,23 @@ export function RichTextEditor({
           
           if (!headerProcessed) {
             // First row is header
-            tableHtml += '<thead class="bg-accent"><tr>';
+            tableHtml += '<thead class="bg-gradient-to-r from-blue-50 to-blue-100"><tr>';
             cells.forEach(cell => {
               const cellContent = cell
-                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                .replace(/\*(.*?)\*/g, '<em>$1</em>');
-              tableHtml += `<th class="border border-gray-300 px-4 py-2 text-left font-semibold">${cellContent}</th>`;
+                .replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold">$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em class="italic">$1</em>');
+              tableHtml += `<th class="border border-gray-300 px-4 py-3 text-left font-semibold text-gray-800">${cellContent}</th>`;
             });
             tableHtml += '</tr></thead><tbody>';
             headerProcessed = true;
           } else {
             // Data rows
-            tableHtml += '<tr class="hover:bg-accent">';
+            tableHtml += '<tr class="hover:bg-gray-50 transition-colors">';
             cells.forEach(cell => {
               const cellContent = cell
-                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                .replace(/\*(.*?)\*/g, '<em>$1</em>');
-              tableHtml += `<td class="border border-gray-300 px-4 py-2">${cellContent}</td>`;
+                .replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold">$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em class="italic">$1</em>');
+              tableHtml += `<td class="border border-gray-300 px-4 py-2 text-gray-700">${cellContent}</td>`;
             });
             tableHtml += '</tr>';
           }
@@ -360,17 +388,23 @@ export function RichTextEditor({
       return tableHtml;
     });
     
-    // Then handle other formatting
+    // Then handle other markdown formatting
     html = html
-      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-      .replace(/\*(.*?)\*/g, '<em>$1</em>')
-      .replace(/^• (.+)$/gm, '<li>$1</li>')
-      .replace(/^(\d+)\. (.+)$/gm, '<li>$2</li>')
+      .replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold text-gray-900">$1</strong>')
+      .replace(/\*(.*?)\*/g, '<em class="italic text-gray-700">$1</em>')
+      .replace(/^• (.+)$/gm, '<li class="ml-2 py-1">$1</li>')
+      .replace(/^(\d+)\. (.+)$/gm, '<li class="ml-2 py-1">$2</li>')
       .replace(/\n/g, '<br>');
     
     // Wrap consecutive list items in ul tags
-    html = html.replace(/(<li>.*?<\/li>(?:<br><li>.*?<\/li>)*)/g, '<ul class="list-none space-y-1 my-4">$1</ul>');
-    html = html.replace(/<br>(?=<li>)/g, '').replace(/(?<=<\/li>)<br>/g, '');
+    html = html.replace(/(<li class="ml-2 py-1">.*?<\/li>(?:<br><li class="ml-2 py-1">.*?<\/li>)*)/g, '<ul class="list-disc list-inside space-y-1 my-4 text-gray-700">$1</ul>');
+    html = html.replace(/<br>(?=<li class="ml-2 py-1">)/g, '').replace(/(?<=<\/li>)<br>/g, '');
+    
+    // Add paragraph styling
+    html = html.replace(/(<br>){2,}/g, '</p><p class="mb-3">');
+    if (!html.startsWith('<table') && !html.startsWith('<ul') && !html.startsWith('<ol')) {
+      html = '<p class="mb-3 text-gray-700">' + html + '</p>';
+    }
     
     return html;
   };

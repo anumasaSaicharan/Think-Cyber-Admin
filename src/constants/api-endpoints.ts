@@ -123,6 +123,17 @@ export const API_ENDPOINTS = {
         BULK: 'upload/bulk',
     },
 
+    // S3 File Upload endpoints (new)
+    UPLOAD_S3: {
+        BASE: 'upload-s3',
+        VIDEO: 'upload-s3/video',
+        IMAGE: 'upload-s3/image',
+        DOCUMENT: 'upload-s3/document',
+        THUMBNAIL: 'upload-s3/thumbnail',
+        MULTIPLE: 'upload-s3/multiple',
+        DELETE: 'upload-s3/delete',
+    },
+
     // Users endpoints
     USERS: {
         BASE: 'users',

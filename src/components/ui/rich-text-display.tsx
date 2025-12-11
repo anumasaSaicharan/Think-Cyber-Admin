@@ -8,30 +8,49 @@ interface RichTextDisplayProps {
 }
 
 export function RichTextDisplay({ content, className = '' }: RichTextDisplayProps) {
-  // Check if content already contains HTML tags (from TinyMCE)
+  // Check if content already contains HTML tags (from TinyMCE or pasted HTML)
   const containsHtml = /<[^>]+>/.test(content);
   
   if (containsHtml) {
-    // Content is already HTML (from TinyMCE), enhance it with better table styling
+    // Content is already HTML, enhance it with better styling
     const enhancedContent = content
       // Add classes to tables for better styling
-      .replace(/<table/g, '<table class="border-collapse border border-gray-300 my-4 w-full"')
+      .replace(/<table/gi, '<table class="border-collapse border border-gray-300 my-4 w-full"')
       // Add classes to table headers
-      .replace(/<th/g, '<th class="border border-gray-300 px-3 py-2 bg-gray-100 font-medium text-left"')
+      .replace(/<th/gi, '<th class="border border-gray-300 px-3 py-2 bg-gray-100 font-medium text-left"')
       // Add classes to table cells
-      .replace(/<td/g, '<td class="border border-gray-300 px-3 py-2"')
+      .replace(/<td/gi, '<td class="border border-gray-300 px-3 py-2"')
+      // Add classes to ordered lists
+      .replace(/<ol>/gi, '<ol class="list-decimal list-inside space-y-2 my-4 ml-4">')
+      .replace(/<ol([^>]*)>/gi, '<ol$1 class="list-decimal list-inside space-y-2 my-4 ml-4">')
+      // Add classes to unordered lists
+      .replace(/<ul>/gi, '<ul class="list-disc list-inside space-y-2 my-4 ml-4">')
+      .replace(/<ul([^>]*)>/gi, '<ul$1 class="list-disc list-inside space-y-2 my-4 ml-4">')
+      // Add classes to list items
+      .replace(/<li>/gi, '<li class="ml-2 py-1 leading-relaxed">')
+      .replace(/<li([^>]*)>/gi, '<li$1 class="ml-2 py-1 leading-relaxed">')
+      // Add classes to strong tags
+      .replace(/<strong>/gi, '<strong class="font-semibold text-gray-900">')
+      .replace(/<strong([^>]*)>/gi, '<strong$1 class="font-semibold text-gray-900">')
+      // Add classes to em tags
+      .replace(/<em>/gi, '<em class="italic text-gray-700">')
+      .replace(/<em([^>]*)>/gi, '<em$1 class="italic text-gray-700">')
       // Add classes to paragraphs
-      .replace(/<p>/g, '<p class="mb-3">')
-      // Add classes to lists
-      .replace(/<ul>/g, '<ul class="list-disc list-inside space-y-1 my-2">')
-      .replace(/<ol>/g, '<ol class="list-decimal list-inside space-y-1 my-2">')
+      .replace(/<p>/gi, '<p class="mb-3">')
+      .replace(/<p([^>]*)>/gi, '<p$1 class="mb-3">')
       // Add classes to headings
-      .replace(/<h1>/g, '<h1 class="text-2xl font-semibold mb-2 mt-4">')
-      .replace(/<h2>/g, '<h2 class="text-xl font-semibold mb-2 mt-4">')
-      .replace(/<h3>/g, '<h3 class="text-lg font-semibold mb-2 mt-4">')
-      .replace(/<h4>/g, '<h4 class="text-base font-semibold mb-2 mt-4">')
-      .replace(/<h5>/g, '<h5 class="text-sm font-semibold mb-2 mt-4">')
-      .replace(/<h6>/g, '<h6 class="text-xs font-semibold mb-2 mt-4">');
+      .replace(/<h1>/gi, '<h1 class="text-2xl font-semibold mb-2 mt-4">')
+      .replace(/<h1([^>]*)>/gi, '<h1$1 class="text-2xl font-semibold mb-2 mt-4">')
+      .replace(/<h2>/gi, '<h2 class="text-xl font-semibold mb-2 mt-4">')
+      .replace(/<h2([^>]*)>/gi, '<h2$1 class="text-xl font-semibold mb-2 mt-4">')
+      .replace(/<h3>/gi, '<h3 class="text-lg font-semibold mb-2 mt-4">')
+      .replace(/<h3([^>]*)>/gi, '<h3$1 class="text-lg font-semibold mb-2 mt-4">')
+      .replace(/<h4>/gi, '<h4 class="text-base font-semibold mb-2 mt-4">')
+      .replace(/<h4([^>]*)>/gi, '<h4$1 class="text-base font-semibold mb-2 mt-4">')
+      .replace(/<h5>/gi, '<h5 class="text-sm font-semibold mb-2 mt-4">')
+      .replace(/<h5([^>]*)>/gi, '<h5$1 class="text-sm font-semibold mb-2 mt-4">')
+      .replace(/<h6>/gi, '<h6 class="text-xs font-semibold mb-2 mt-4">')
+      .replace(/<h6([^>]*)>/gi, '<h6$1 class="text-xs font-semibold mb-2 mt-4">');
     
     return (
       <div 
