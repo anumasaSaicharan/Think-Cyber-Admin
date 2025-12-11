@@ -16,8 +16,8 @@ export const metadata: Metadata = {
 };
 
 export default function SignInViewPage({ stars }: { stars: number }) {
-  const [email, setEmail] = useState('admin_thinkcyber@gmail.com');
-  const [password, setPassword] = useState('admin123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [selectedLanguage, setSelectedLanguage] = useState('English');
   const [isLoading, setIsLoading] = useState(false);
 
