@@ -1,5 +1,5 @@
 // API Base URL from environment variables
-export const API_BASE_URL = 'http://localhost:8081/api';
+export const API_BASE_URL = 'https://api.thinkcyber.info/api';
 
 // API Endpoints Constants - These are relative to the base URL
 export const API_ENDPOINTS = {
