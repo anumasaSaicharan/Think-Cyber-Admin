@@ -41,6 +41,7 @@ export interface Topic {
   modules: Module[];
   isFree: boolean;
   price: string;
+  displayOrder?: number;
   tags: string[];
   status: 'draft' | 'published' | 'archived';
   targetAudience: string[];
@@ -59,9 +60,9 @@ export interface Topic {
   updatedBy?: string;
 }
 
-export interface TopicFormData extends Omit<Topic, 'id' | 'createdAt' | 'updatedAt' | 'createdBy' | 'updatedBy' | 'isActive' | 'enrollmentCount' | 'rating' | 'reviewCount'> {}
+export interface TopicFormData extends Omit<Topic, 'id' | 'createdAt' | 'updatedAt' | 'createdBy' | 'updatedBy' | 'isActive' | 'enrollmentCount' | 'rating' | 'reviewCount'> { }
 
-export interface CreateTopicRequest extends TopicFormData {}
+export interface CreateTopicRequest extends TopicFormData { }
 
 export interface UpdateTopicRequest extends Partial<TopicFormData> {
   id: string;
@@ -81,6 +82,7 @@ export interface TopicListItem {
   status: string;
   featured: boolean;
   isFree: boolean;
+  displayOrder?: number;
   price: string;
   enrollmentCount: number;
   rating: number;

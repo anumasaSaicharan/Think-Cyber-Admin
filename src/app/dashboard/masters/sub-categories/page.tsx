@@ -47,6 +47,7 @@ interface SubCategory {
   categoryId: number;
   categoryName: string;
   topicsCount: number;
+  displayOrder: number;
   status: 'Active' | 'Draft' | 'Inactive';
   createdAt: string;
   updatedAt?: string;
@@ -102,7 +103,26 @@ export default function SubCategoriesPage() {
       });
 
       if (result.success && result.data) {
-        setSubCategories(result.data);
+
+        // Helper to find category name (requires categories to be loaded or derived from somewhere else)
+        // Since we fetch categories independently, we can use that state if available, 
+        // OR we can rely on the fact that we need to lookup.
+        // Issue: categories state might not be set when this runs.
+        // Ideally we should process this when both are ready? 
+        // For now, simpler map and allow categoryName to be populated dynamically or 
+        // if the API returns category_id, map it.
+
+        const mappedSubCategories = result.data.map((sub: any) => ({
+          ...sub,
+          categoryId: sub.category_id,
+          topicsCount: sub.topics_count,
+          displayOrder: sub.display_order,
+          createdAt: sub.created_at,
+          updatedAt: sub.updated_at,
+          categoryName: categories.find(c => c.id === sub.category_id)?.name || 'Unknown'
+        }));
+
+        setSubCategories(mappedSubCategories as SubCategory[]);
 
         // Handle stats and categories from API response
         const apiResult = result as any;
@@ -128,7 +148,7 @@ export default function SubCategoriesPage() {
           categoriesUsed: statsData.categoriesUsed
         });
 
-        setCategories(apiResult.categories || []);
+
       } else {
         toast.error('Failed to fetch sub-categories. Please try again.');
         console.error('Failed to fetch sub-categories:', result.error);
@@ -138,6 +158,18 @@ export default function SubCategoriesPage() {
       console.error('Error fetching sub-categories:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Fetch categories for dropdown
+  const fetchCategories = async () => {
+    try {
+      const result = await apiService.get(API_ENDPOINTS.CATEGORIES.BASE);
+      if (result.success && result.data) {
+        setCategories(result.data as Category[]);
+      }
+    } catch (error) {
+      console.error('Error fetching categories:', error);
     }
   };
 
@@ -151,9 +183,16 @@ export default function SubCategoriesPage() {
     try {
       if (selectedSubCategory) {
         // Update existing sub-category
+        // Update existing sub-category
+        const apiPayload = {
+          ...subCategoryData,
+          category_id: subCategoryData.categoryId,
+          display_order: subCategoryData.displayOrder
+        };
+
         const result = await apiService.put(
           API_ENDPOINTS.SUBCATEGORIES.BY_ID(selectedSubCategory.id),
-          subCategoryData
+          apiPayload
         );
 
         if (result.success) {
@@ -167,9 +206,16 @@ export default function SubCategoriesPage() {
         }
       } else {
         // Create new sub-category
+        // Create new sub-category
+        const apiPayload = {
+          ...subCategoryData,
+          category_id: subCategoryData.categoryId,
+          display_order: subCategoryData.displayOrder
+        };
+
         const result = await apiService.post(
           API_ENDPOINTS.SUBCATEGORIES.BASE,
-          subCategoryData
+          apiPayload
         );
 
         if (result.success) {
@@ -234,6 +280,11 @@ export default function SubCategoriesPage() {
 
     return () => clearTimeout(timer);
   }, [searchTerm, statusFilter, categoryFilter]);
+
+  // Initial load of categories
+  useEffect(() => {
+    fetchCategories();
+  }, []);
 
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
@@ -417,8 +468,8 @@ export default function SubCategoriesPage() {
                 <Layers className='text-muted-foreground mx-auto h-12 w-12' />
                 <p className='text-muted-foreground mt-2'>
                   {searchTerm ||
-                  statusFilter !== 'all' ||
-                  categoryFilter !== 'all'
+                    statusFilter !== 'all' ||
+                    categoryFilter !== 'all'
                     ? 'No sub-categories found matching your filters.'
                     : 'No sub-categories found. Create your first sub-category!'}
                 </p>
@@ -441,13 +492,13 @@ export default function SubCategoriesPage() {
                         </p>
                         <div className='mt-1 flex items-center gap-2'>
                           <p className='text-muted-foreground text-xs'>
-                            Category: {subCategory.categoryName}
+                            Category: {categories.find(c => c.id === subCategory.categoryId)?.name || subCategory.categoryName || 'Loading...'}
                           </p>
                           <span className='text-muted-foreground text-xs'>
                             •
                           </span>
                           <p className='text-muted-foreground text-xs'>
-                            Created: {subCategory.createdAt}
+                            Created: {subCategory.createdAt ? new Date(subCategory.createdAt).toLocaleDateString() : 'Unknown'}
                           </p>
                         </div>
                       </div>

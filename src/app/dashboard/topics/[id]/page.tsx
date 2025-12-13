@@ -9,13 +9,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { 
-  ArrowLeft, 
-  Edit, 
-  Trash2, 
-  Star, 
-  Users, 
-  Clock, 
+import {
+  ArrowLeft,
+  Edit,
+  Trash2,
+  Star,
+  Users,
+  Clock,
   BookOpen,
   // ...existing code...
   Loader2,
@@ -39,7 +39,7 @@ export default function TopicDetailsPage() {
   const router = useRouter();
   const params = useParams();
   const topicId = params.id as string;
-  
+
   const [topic, setTopic] = useState<Topic | null>(null);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
@@ -60,8 +60,8 @@ export default function TopicDetailsPage() {
 
   // Toggle module expansion
   const toggleModuleExpansion = (moduleId: string | number) => {
-    setExpandedModules(prev => 
-      prev.includes(moduleId) 
+    setExpandedModules(prev =>
+      prev.includes(moduleId)
         ? prev.filter(id => id !== moduleId)
         : [...prev, moduleId]
     );
@@ -95,9 +95,9 @@ export default function TopicDetailsPage() {
       try {
         setLoading(true);
         const result = await apiService.get(API_ENDPOINTS.TOPICS.BY_ID(topicId));
-        
-  // ...existing code...
-        
+
+        // ...existing code...
+
         if (result.success && result.data) {
           setTopic(result.data);
         } else {
@@ -105,7 +105,7 @@ export default function TopicDetailsPage() {
           toast.error('Failed to load topic data');
         }
       } catch (error) {
-  // ...existing code...
+        // ...existing code...
         setError('Failed to load topic data');
         toast.error('Failed to load topic data');
       } finally {
@@ -119,14 +119,14 @@ export default function TopicDetailsPage() {
   }, [topicId]);
 
   const handleDelete = async () => {
-  if (!confirm('Are you sure you want to delete this topic? This action cannot be undone.')) {
+    if (!confirm('Are you sure you want to delete this topic? This action cannot be undone.')) {
       return;
     }
 
     try {
       setActionLoading(true);
       const result = await apiService.delete(API_ENDPOINTS.TOPICS.BY_ID(topicId));
-      
+
       if (result.success) {
         toast.success('Topic deleted successfully');
         router.push('/dashboard/topics');
@@ -134,7 +134,7 @@ export default function TopicDetailsPage() {
         toast.error(result.error || 'Failed to delete topic');
       }
     } catch (error) {
-  // ...existing code...
+      // ...existing code...
       toast.error('Failed to delete topic');
     } finally {
       setActionLoading(false);
@@ -143,14 +143,14 @@ export default function TopicDetailsPage() {
 
   const handleToggleFeatured = async () => {
     if (!topic) return;
-    
+
     try {
       setActionLoading(true);
       const result = await apiService.put(API_ENDPOINTS.TOPICS.BY_ID(topicId), {
         ...topic,
         featured: !topic.featured,
       });
-      
+
       if (result.success) {
         setTopic({ ...topic, featured: !topic.featured });
         toast.success('Topic updated successfully');
@@ -158,7 +158,7 @@ export default function TopicDetailsPage() {
         toast.error(result.error || 'Failed to update topic');
       }
     } catch (error) {
-  // ...existing code...
+      // ...existing code...
       toast.error('Failed to update topic');
     } finally {
       setActionLoading(false);
@@ -229,7 +229,7 @@ export default function TopicDetailsPage() {
     <PageContainer>
       <div className='space-y-6'>
         <Breadcrumbs />
-        
+
         <div className='flex items-center justify-between'>
           <div className="flex items-center space-x-4">
             <div className="p-3 bg-blue-100 rounded-lg">
@@ -259,8 +259,8 @@ export default function TopicDetailsPage() {
                 Edit
               </Button>
             </Link>
-            <Button 
-              variant="destructive" 
+            <Button
+              variant="destructive"
               onClick={handleDelete}
               disabled={actionLoading}
             >
@@ -300,6 +300,11 @@ export default function TopicDetailsPage() {
               ${topic.price}
             </Badge>
           )}
+          {topic.displayOrder !== undefined && (
+            <Badge variant="outline" className="bg-slate-100 text-slate-700 border-slate-300">
+              Order: {topic.displayOrder}
+            </Badge>
+          )}
         </div>
 
         {/* Stats Cards */}
@@ -313,7 +318,7 @@ export default function TopicDetailsPage() {
               <div className='text-2xl font-bold'>{topic.enrollmentCount?.toLocaleString() || 0}</div>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
               <CardTitle className='text-sm font-medium'>Rating</CardTitle>
@@ -328,7 +333,7 @@ export default function TopicDetailsPage() {
               </p>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
               <CardTitle className='text-sm font-medium'>Modules</CardTitle>
@@ -341,7 +346,7 @@ export default function TopicDetailsPage() {
               </p>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
               <CardTitle className='text-sm font-medium'>Duration</CardTitle>
@@ -365,36 +370,36 @@ export default function TopicDetailsPage() {
             <div>
               <h4 className="font-medium mb-3">Description</h4>
               {topic.description ? (
-                <RichTextDisplay 
-                  content={topic.description} 
+                <RichTextDisplay
+                  content={topic.description}
                   className="text-sm text-muted-foreground"
                 />
               ) : (
                 <p className="text-sm text-muted-foreground">No description provided</p>
               )}
             </div>
-            
+
             <Separator />
-            
+
             <div>
               <h4 className="font-medium mb-3">Learning Objectives</h4>
               {topic.learningObjectives ? (
-                <RichTextDisplay 
-                  content={topic.learningObjectives} 
+                <RichTextDisplay
+                  content={topic.learningObjectives}
                   className="text-sm text-muted-foreground"
                 />
               ) : (
                 <p className="text-sm text-muted-foreground">No learning objectives provided</p>
               )}
             </div>
-            
+
             {topic.prerequisites && (
               <>
                 <Separator />
                 <div>
                   <h4 className="font-medium mb-3">Prerequisites</h4>
-                  <RichTextDisplay 
-                    content={topic.prerequisites} 
+                  <RichTextDisplay
+                    content={topic.prerequisites}
                     className="text-sm text-muted-foreground"
                   />
                 </div>
@@ -447,7 +452,7 @@ export default function TopicDetailsPage() {
                   )}
                 </div>
               </div>
-              
+
               {/* Tags */}
               <div>
                 <h4 className="font-medium mb-2 text-sm uppercase tracking-wide text-muted-foreground">Tags</h4>
@@ -463,17 +468,17 @@ export default function TopicDetailsPage() {
                   )}
                 </div>
               </div>
-              
+
               {/* Dates */}
               <div className="space-y-4">
                 <div>
                   <h4 className="font-medium mb-2 text-sm uppercase tracking-wide text-muted-foreground">Created</h4>
                   <p className="text-sm text-muted-foreground flex items-center">
                     <Calendar className="w-3 h-3 mr-2" />
-                    {topic.createdAt ? formatDate(topic.createdAt, { 
-                      month: 'short', 
-                      day: 'numeric', 
-                      year: 'numeric' 
+                    {topic.createdAt ? formatDate(topic.createdAt, {
+                      month: 'short',
+                      day: 'numeric',
+                      year: 'numeric'
                     }) : 'Unknown'}
                   </p>
                 </div>
@@ -481,10 +486,10 @@ export default function TopicDetailsPage() {
                   <h4 className="font-medium mb-2 text-sm uppercase tracking-wide text-muted-foreground">Updated</h4>
                   <p className="text-sm text-muted-foreground flex items-center">
                     <Calendar className="w-3 h-3 mr-2" />
-                    {topic.updatedAt ? formatDate(topic.updatedAt, { 
-                      month: 'short', 
-                      day: 'numeric', 
-                      year: 'numeric' 
+                    {topic.updatedAt ? formatDate(topic.updatedAt, {
+                      month: 'short',
+                      day: 'numeric',
+                      year: 'numeric'
                     }) : 'Unknown'}
                   </p>
                 </div>
@@ -545,7 +550,7 @@ export default function TopicDetailsPage() {
                           </div>
                         </CardHeader>
                       </CollapsibleTrigger>
-                      
+
                       <CollapsibleContent>
                         <CardContent className="pt-0">
                           <div className="space-y-4">
@@ -553,8 +558,8 @@ export default function TopicDetailsPage() {
                             {module.description && (
                               <div>
                                 <h5 className="font-medium mb-2">Description</h5>
-                                <RichTextDisplay 
-                                  content={module.description} 
+                                <RichTextDisplay
+                                  content={module.description}
                                   className="text-sm text-muted-foreground mb-4"
                                 />
                               </div>
@@ -569,8 +574,8 @@ export default function TopicDetailsPage() {
                                 </h5>
                                 <div className="space-y-2">
                                   {(module.videos || []).map((video, videoIndex) => (
-                                    <div 
-                                      key={video.id} 
+                                    <div
+                                      key={video.id}
                                       className="flex items-center justify-between bg-white p-3 rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all cursor-pointer"
                                       onClick={() => handleVideoClick(video)}
                                     >

@@ -14,6 +14,7 @@ interface Category {
   name: string;
   description: string;
   price: number;
+  displayOrder: number;
   status: 'Active' | 'Draft' | 'Inactive';
 }
 
@@ -36,38 +37,41 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
   const [formData, setFormData] = useState<Category>({
     name: '',
     description: '',
-    price:0,
+    price: 0,
+    displayOrder: 0,
     status: 'Active'
   });
-  
+
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Reset form when modal opens/closes or category changes
- useEffect(() => {
-  if (isOpen) {
-    if (category) {
-      // Edit mode
-      setFormData({
-        id: category.id,
-        name: category.name || '',
-        description: category.description || '',
-        price: category.price || 0,
-        status: category.status || 'Active',
-      });
-    } else {
-      // Add mode
-      setFormData({
-        name: '',
-        description: '',
-        price: 0,
-        status: 'Active',
-      });
-    }
+  useEffect(() => {
+    if (isOpen) {
+      if (category) {
+        // Edit mode
+        setFormData({
+          id: category.id,
+          name: category.name || '',
+          description: category.description || '',
+          price: category.price || 0,
+          displayOrder: category.displayOrder || 0,
+          status: category.status || 'Active',
+        });
+      } else {
+        // Add mode
+        setFormData({
+          name: '',
+          description: '',
+          price: 0,
+          displayOrder: 0,
+          status: 'Active',
+        });
+      }
 
-    setErrors({});
-  }
-}, [isOpen, category]);
+      setErrors({});
+    }
+  }, [isOpen, category]);
 
 
   const validateForm = (): boolean => {
@@ -89,6 +93,10 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
       newErrors.price = 'Price must be a positive number';
     }
 
+    if (formData.displayOrder < 0 || !Number.isInteger(Number(formData.displayOrder))) {
+      newErrors.displayOrder = 'Display order must be a non-negative integer';
+    }
+
     if (!formData.status) {
       newErrors.status = 'Status is required';
     }
@@ -97,12 +105,12 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleInputChange = (field: keyof Category, value: string) => {
+  const handleInputChange = (field: keyof Category, value: string | number) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
     }));
-    
+
     // Clear error for this field when user starts typing
     if (errors[field]) {
       setErrors(prev => ({
@@ -114,13 +122,13 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
 
     setIsSubmitting(true);
-    
+
     try {
       await onSave(formData);
       onClose();
@@ -178,7 +186,7 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
           )}
         </div>
 
-       {/* Price */}
+        {/* Price */}
         <div className="space-y-2">
           <Label htmlFor="category-price">Price ₹ *</Label>
           <Input
@@ -199,6 +207,30 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
           />
           {errors.price && (
             <p className="text-sm text-red-500">{errors.price}</p>
+          )}
+        </div>
+
+        {/* Display Order */}
+        <div className="space-y-2">
+          <Label htmlFor="category-display-order">Display Order *</Label>
+          <Input
+            id="category-display-order"
+            type="number"
+            min="0"
+            step="1"
+            value={formData.displayOrder}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (value === '' || /^\d+$/.test(value)) {
+                handleInputChange('displayOrder', value);
+              }
+            }}
+            placeholder="0"
+            className={errors.displayOrder ? 'border-red-500' : ''}
+            disabled={isSubmitting}
+          />
+          {errors.displayOrder && (
+            <p className="text-sm text-red-500">{errors.displayOrder}</p>
           )}
         </div>
 

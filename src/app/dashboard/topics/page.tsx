@@ -10,15 +10,15 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { apiService } from '@/lib/api-service';
 import { API_ENDPOINTS } from '@/constants/api-endpoints';
-import { 
-  Search, 
-  Plus, 
-  Edit, 
-  Trash2, 
-  BookOpen, 
-  Users, 
-  Clock, 
-  Loader2, 
+import {
+  Search,
+  Plus,
+  Edit,
+  Trash2,
+  BookOpen,
+  Users,
+  Clock,
+  Loader2,
   RefreshCw,
   Eye,
   Copy,
@@ -29,7 +29,7 @@ import {
   MoreHorizontal,
   ExternalLink
 } from 'lucide-react';
-import { 
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -70,11 +70,11 @@ export default function TopicsPage() {
 
   // Fetch categories from API
   const fetchCategories = useCallback(async () => {
-    try { 
+    try {
       const result = await apiService.get(API_ENDPOINTS.CATEGORIES.BASE, {
         params: { fetchAll: 'true' }
       });
-      
+
       if (result.success && result.data) {
         const activeCategories = result.data
           .filter((cat: any) => cat.status === 'Active')
@@ -82,12 +82,12 @@ export default function TopicsPage() {
             id: String(cat.id),
             name: cat.name
           }));
-         setCategories(activeCategories);
+        setCategories(activeCategories);
       } else {
-         setCategories([]);
+        setCategories([]);
       }
     } catch (error) {
-       setCategories([]);
+      setCategories([]);
     }
   }, []);
 
@@ -95,19 +95,19 @@ export default function TopicsPage() {
   const fetchTopics = useCallback(async () => {
     try {
       setLoading(true);
-      
+
       const params: Record<string, string> = {};
       if (searchTerm) params.search = searchTerm;
       if (selectedCategory && selectedCategory !== 'all') params.category = selectedCategory;
       if (selectedStatus && selectedStatus !== 'all') params.status = selectedStatus;
       if (selectedDifficulty && selectedDifficulty !== 'all') params.difficulty = selectedDifficulty;
-      
+
       const result = await apiService.get(API_ENDPOINTS.TOPICS.BASE, { params });
-      
+
       if (result.success) {
         const topicsData = result.data || [];
         setTopics(topicsData);
-        
+
         // Calculate stats from API response or compute from data
         const calculatedStats = {
           totalTopics: result.stats?.totalTopics || topicsData.length,
@@ -117,19 +117,19 @@ export default function TopicsPage() {
           freeTopics: result.stats?.freeTopics || topicsData.filter((topic: TopicListItem) => topic.isFree).length,
           paidTopics: result.stats?.paidTopics || topicsData.filter((topic: TopicListItem) => !topic.isFree).length,
           totalEnrollments: result.stats?.totalEnrollments || topicsData.reduce((sum: number, topic: TopicListItem) => sum + (topic.enrollmentCount || 0), 0),
-          averageRating: result.stats?.averageRating || (topicsData.length > 0 
-            ? topicsData.reduce((sum: number, topic: TopicListItem) => sum + (topic.rating || 0), 0) / topicsData.length 
+          averageRating: result.stats?.averageRating || (topicsData.length > 0
+            ? topicsData.reduce((sum: number, topic: TopicListItem) => sum + (topic.rating || 0), 0) / topicsData.length
             : 0
           ),
         };
-        
-         setStats(calculatedStats);
+
+        setStats(calculatedStats);
       } else {
         toast.error('Failed to fetch topics. Please try again.');
-       }
+      }
     } catch (error) {
       toast.error('Network error. Please check your connection.');
-     } finally {
+    } finally {
       setLoading(false);
     }
   }, [searchTerm, selectedCategory, selectedStatus, selectedDifficulty]);
@@ -142,7 +142,7 @@ export default function TopicsPage() {
 
     try {
       const result = await apiService.delete(API_ENDPOINTS.TOPICS.DELETE(topicId));
-      
+
       if (result.success) {
         toast.success('Topic deleted successfully');
         fetchTopics(); // Refresh the list
@@ -166,7 +166,7 @@ export default function TopicsPage() {
       };
 
       const result = await apiService.put(API_ENDPOINTS.TOPICS.UPDATE(topicId), updateData);
-      
+
       if (result.success) {
         toast.success('Topic updated successfully');
         fetchTopics(); // Refresh the list
@@ -191,7 +191,7 @@ export default function TopicsPage() {
       };
 
       const result = await apiService.put(API_ENDPOINTS.TOPICS.UPDATE(topicId), updateData);
-      
+
       if (result.success) {
         toast.success(`Topic ${newStatus === 'published' ? 'published' : 'unpublished'} successfully`);
         fetchTopics(); // Refresh the list
@@ -218,7 +218,7 @@ export default function TopicsPage() {
       };
 
       const result = await apiService.post(API_ENDPOINTS.TOPICS.CREATE, duplicateData);
-      
+
       if (result.success) {
         toast.success('Topic duplicated successfully');
         fetchTopics(); // Refresh the list
@@ -288,7 +288,7 @@ export default function TopicsPage() {
     <PageContainer>
       <div className='space-y-4'>
         <Breadcrumbs />
-        
+
         <div className='flex items-center justify-between'>
           <div>
             <h1 className='text-3xl font-bold tracking-tight'>Topics Management</h1>
@@ -328,7 +328,7 @@ export default function TopicsPage() {
               </p>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
               <CardTitle className='text-sm font-medium'>Total Enrollments</CardTitle>
@@ -341,7 +341,7 @@ export default function TopicsPage() {
               </p>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
               <CardTitle className='text-sm font-medium'>Featured Topics</CardTitle>
@@ -354,7 +354,7 @@ export default function TopicsPage() {
               </p>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
               <CardTitle className='text-sm font-medium'>Average Rating</CardTitle>
@@ -378,13 +378,13 @@ export default function TopicsPage() {
             <CardDescription>
               Manage and organize your educational topics
             </CardDescription>
-            
+
             {/* Search and Filters */}
             <div className='flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4'>
               <div className='relative flex-1 max-w-sm'>
                 <Search className='absolute left-2 top-2.5 h-4 w-4 text-muted-foreground' />
-                <Input 
-                  placeholder='Search topics...' 
+                <Input
+                  placeholder='Search topics...'
                   className='pl-8'
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
@@ -450,7 +450,7 @@ export default function TopicsPage() {
               </div>
             )}
           </CardHeader>
-          
+
           <CardContent>
             {loading ? (
               <div className="flex items-center justify-center py-8">
@@ -480,6 +480,11 @@ export default function TopicsPage() {
                 {topics.map((topic) => (
                   <div key={topic.id} className='flex items-center justify-between p-4 border rounded-lg hover:bg-accent dark:hover:bg-gray-800'>
                     <div className='flex items-center space-x-4'>
+                      {/* <div className="flex flex-col items-center justify-center w-16 h-16 bg-muted/50 rounded-lg border border-border/50">
+                        <span className="text-[10px] uppercase text-muted-foreground font-medium">Order</span>
+                        <span className="text-xl font-bold text-foreground">{topic.display_order ?? 0}</span>
+                      </div> */}
+
                       <div className='p-2 bg-blue-100 rounded-lg'>
                         <span className='text-2xl'>{topic.emoji || '📚'}</span>
                       </div>
@@ -522,7 +527,7 @@ export default function TopicsPage() {
                         </div>
                       </div>
                     </div>
-                    
+
                     <div className='flex items-center space-x-4'>
                       <div className='text-right hidden sm:block'>
                         <p className='text-sm font-medium'>{(topic.enrollmentCount || 0).toLocaleString()} enrolled</p>
@@ -530,14 +535,14 @@ export default function TopicsPage() {
                           ⭐ {topic.rating ? topic.rating.toFixed(1) : 'N/A'} ({topic.reviewCount || 0} reviews)
                         </p>
                         <p className='text-xs text-muted-foreground'>
-                          Updated: {formatDate(topic.updatedAt, { 
-                            month: 'short', 
-                            day: 'numeric', 
-                            year: 'numeric' 
+                          Updated: {formatDate(topic.updatedAt, {
+                            month: 'short',
+                            day: 'numeric',
+                            year: 'numeric'
                           })}
                         </p>
                       </div>
-                      
+
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" className="h-8 w-8 p-0">

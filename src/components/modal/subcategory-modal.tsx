@@ -19,6 +19,7 @@ interface SubCategory {
   name: string;
   description: string;
   categoryId: number;
+  displayOrder: number;
   status: 'Active' | 'Draft' | 'Inactive';
 }
 
@@ -42,10 +43,12 @@ export const SubCategoryModal: React.FC<SubCategoryModalProps> = ({
   const [formData, setFormData] = useState<SubCategory>({
     name: '',
     description: '',
+
     categoryId: 0,
+    displayOrder: 0,
     status: 'Active'
   });
-  
+
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -59,6 +62,7 @@ export const SubCategoryModal: React.FC<SubCategoryModalProps> = ({
           name: subCategory.name || '',
           description: subCategory.description || '',
           categoryId: subCategory.categoryId || 0,
+          displayOrder: subCategory.displayOrder || 0,
           status: subCategory.status || 'Active'
         });
       } else {
@@ -67,6 +71,7 @@ export const SubCategoryModal: React.FC<SubCategoryModalProps> = ({
           name: '',
           description: '',
           categoryId: categories.length > 0 ? categories[0].id : 0,
+          displayOrder: 0,
           status: 'Active'
         });
       }
@@ -97,6 +102,10 @@ export const SubCategoryModal: React.FC<SubCategoryModalProps> = ({
       newErrors.status = 'Status is required';
     }
 
+    if (formData.displayOrder < 0 || !Number.isInteger(Number(formData.displayOrder))) {
+      newErrors.displayOrder = 'Display order must be a non-negative integer';
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -106,7 +115,7 @@ export const SubCategoryModal: React.FC<SubCategoryModalProps> = ({
       ...prev,
       [field]: value
     }));
-    
+
     // Clear error for this field when user starts typing
     if (errors[field]) {
       setErrors(prev => ({
@@ -118,13 +127,13 @@ export const SubCategoryModal: React.FC<SubCategoryModalProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
 
     setIsSubmitting(true);
-    
+
     try {
       await onSave(formData);
       onClose();
@@ -206,6 +215,32 @@ export const SubCategoryModal: React.FC<SubCategoryModalProps> = ({
           )}
         </div>
 
+
+
+        {/* Display Order */}
+        <div className="space-y-2">
+          <Label htmlFor="subcategory-display-order">Display Order *</Label>
+          <Input
+            id="subcategory-display-order"
+            type="number"
+            min="0"
+            step="1"
+            value={formData.displayOrder}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (value === '' || /^\d+$/.test(value)) {
+                handleInputChange('displayOrder', value);
+              }
+            }}
+            placeholder="0"
+            className={errors.displayOrder ? 'border-red-500' : ''}
+            disabled={isSubmitting}
+          />
+          {errors.displayOrder && (
+            <p className="text-sm text-red-500">{errors.displayOrder}</p>
+          )}
+        </div>
+
         {/* Status */}
         <div className="space-y-2">
           <Label htmlFor="subcategory-status">Status *</Label>
@@ -254,6 +289,6 @@ export const SubCategoryModal: React.FC<SubCategoryModalProps> = ({
           </Button>
         </div>
       </form>
-    </Modal>
+    </Modal >
   );
 };

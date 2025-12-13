@@ -20,7 +20,8 @@ interface Category {
   name: string;
   description: string;
   topicsCount: number;
-  price:number;
+  price: number;
+  displayOrder: number;
   status: 'Active' | 'Draft' | 'Inactive';
   createdAt: string;
   updatedAt?: string;
@@ -47,7 +48,7 @@ export default function CategoriesPage() {
   });
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  
+
   // Modal states
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -63,13 +64,19 @@ export default function CategoriesPage() {
       if (searchTerm) {
         params.search = searchTerm;
       }
-      
+
       const result = await apiService.get(API_ENDPOINTS.CATEGORIES.BASE, { params });
-      
+
       if (result.success && result.data) {
-        const categoriesData = result.data;
-        setCategories(categoriesData);
-        
+        const categoriesData = result.data.map((cat: any) => ({
+          ...cat,
+          createdAt: cat.created_at,
+          updatedAt: cat.updated_at,
+          topicsCount: cat.topics_count,
+          displayOrder: cat.display_order
+        }));
+        setCategories(categoriesData as Category[]);
+
         // Calculate stats from the categories data
         const total = result.meta?.total || categoriesData.length;
         const active = categoriesData.filter((cat: Category) => cat.status === 'Active').length;
@@ -77,7 +84,7 @@ export default function CategoriesPage() {
         const inactive = categoriesData.filter((cat: Category) => cat.status === 'Inactive').length;
         const totalTopics = categoriesData.reduce((sum: number, cat: Category) => sum + (cat.topicsCount || 0), 0);
         const averageTopicsPerCategory = total > 0 ? (totalTopics / total).toFixed(1) : '0';
-        
+
         setStats({
           total,
           active,
@@ -103,8 +110,17 @@ export default function CategoriesPage() {
     try {
       if (selectedCategory) {
         // Update existing category
-        const result = await apiService.put(API_ENDPOINTS.CATEGORIES.BY_ID(selectedCategory.id), categoryData);
-        
+        // Create snake_case payload for API
+        const apiPayload = {
+          ...categoryData,
+          display_order: categoryData.displayOrder
+        };
+
+        const result = await apiService.put(
+          API_ENDPOINTS.CATEGORIES.BY_ID(selectedCategory.id),
+          apiPayload
+        );
+
         if (result.success) {
           await fetchCategories(); // Refresh the list
           setIsEditModalOpen(false);
@@ -116,8 +132,14 @@ export default function CategoriesPage() {
         }
       } else {
         // Create new category
-        const result = await apiService.post(API_ENDPOINTS.CATEGORIES.BASE, categoryData);
-        
+        // Create snake_case payload for API
+        const apiPayload = {
+          ...categoryData,
+          display_order: categoryData.displayOrder
+        };
+
+        const result = await apiService.post(API_ENDPOINTS.CATEGORIES.BASE, apiPayload);
+
         if (result.success) {
           await fetchCategories(); // Refresh the list
           setIsAddModalOpen(false);
@@ -136,10 +158,10 @@ export default function CategoriesPage() {
   // Delete category
   const handleDeleteCategory = async () => {
     if (!categoryToDelete) return;
-    
+
     try {
       const result = await apiService.delete(API_ENDPOINTS.CATEGORIES.BY_ID(categoryToDelete.id));
-      
+
       if (result.success) {
         await fetchCategories(); // Refresh the list
         setIsDeleteModalOpen(false);
@@ -192,7 +214,7 @@ export default function CategoriesPage() {
     <PageContainer>
       <div className='space-y-4'>
         <Breadcrumbs />
-        
+
         <div className='flex items-center justify-between'>
           <div>
             <h1 className='text-3xl font-bold tracking-tight'>Categories Management</h1>
@@ -230,7 +252,7 @@ export default function CategoriesPage() {
               </p>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
               <CardTitle className='text-sm font-medium'>Active Categories</CardTitle>
@@ -243,7 +265,7 @@ export default function CategoriesPage() {
               </p>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
               <CardTitle className='text-sm font-medium'>Total Topics</CardTitle>
@@ -256,7 +278,7 @@ export default function CategoriesPage() {
               </p>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
               <CardTitle className='text-sm font-medium'>Avg Topics/Category</CardTitle>
@@ -281,8 +303,8 @@ export default function CategoriesPage() {
             <div className='flex space-x-2'>
               <div className='relative flex-1 max-w-sm'>
                 <Search className='absolute left-2 top-2.5 h-4 w-4 text-muted-foreground' />
-                <Input 
-                  placeholder='Search categories...' 
+                <Input
+                  placeholder='Search categories...'
                   className='pl-8'
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
@@ -316,10 +338,10 @@ export default function CategoriesPage() {
                         <p className='text-sm text-muted-foreground'>{category.description}</p>
                         <p className='text-sm text-muted-foreground'>Price:{category.price} ₹</p>
                         <p className='text-xs text-muted-foreground'>
-                          Created: {category.createdAt ? formatDate(category.createdAt, { 
-                            month: 'short', 
-                            day: 'numeric', 
-                            year: 'numeric' 
+                          Created: {category.createdAt ? formatDate(category.createdAt, {
+                            month: 'short',
+                            day: 'numeric',
+                            year: 'numeric'
                           }) : 'Unknown'}
                         </p>
                       </div>
@@ -332,15 +354,15 @@ export default function CategoriesPage() {
                         </Badge>
                       </div>
                       <div className='flex space-x-2'>
-                        <Button 
-                          variant='outline' 
+                        <Button
+                          variant='outline'
                           size='sm'
                           onClick={() => handleEditClick(category)}
                         >
                           <Edit className='h-4 w-4' />
                         </Button>
-                        <Button 
-                          variant='outline' 
+                        <Button
+                          variant='outline'
                           size='sm'
                           onClick={() => handleDeleteClick(category)}
                         >

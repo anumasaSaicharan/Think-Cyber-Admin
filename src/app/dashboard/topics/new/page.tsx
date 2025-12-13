@@ -19,21 +19,21 @@ import { RichTextEditor } from '@/components/ui/rich-text-editor';
 import { VideoUpload } from '@/components/video-upload';
 import { VideoUploadModal } from '@/components/video-upload-modal';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { 
-  Save, 
-  ArrowLeft, 
-  Plus, 
-  X, 
-  Eye, 
-  FileText, 
-  Upload, 
-  ChevronRight, 
-  ChevronLeft, 
-  Shield, 
-  Users, 
-  Target, 
-  DollarSign, 
-  Settings, 
+import {
+  Save,
+  ArrowLeft,
+  Plus,
+  X,
+  Eye,
+  FileText,
+  Upload,
+  ChevronRight,
+  ChevronLeft,
+  Shield,
+  Users,
+  Target,
+  DollarSign,
+  Settings,
   BookOpen,
   Video,
   PlayCircle,
@@ -67,7 +67,7 @@ const fetchCategories = async () => {
       params: { fetchAll: 'true' }
     });
     console.log('📊 Categories API result:', result);
-    
+
     if (result.success && result.data) {
       const categories = result.data.filter((cat: any) => cat.status === 'Active');
       console.log('✅ Active categories loaded:', categories);
@@ -91,7 +91,7 @@ const fetchSubcategories = async (categoryId: string) => {
       params: { categoryId, fetchAll: 'true' }
     });
     console.log('📊 Subcategories API result:', result);
-    
+
     if (result.success && result.data) {
       const subcategories = result.data.filter((sub: any) => sub.status === 'Active');
       console.log('✅ Active subcategories loaded:', subcategories);
@@ -146,13 +146,14 @@ interface LocalTopicFormData {
   duration: string;
   description: string;
   learningObjectives: string;
-  
+
   // Modules & Videos
   modules: LocalModule[];
-  
+
   // Pricing & Settings
   isFree: boolean;
   price: string;
+  displayOrder: number;
   tags: string[];
   status: 'draft' | 'published' | 'archived';
   targetAudience: string[];
@@ -177,6 +178,7 @@ const initialFormData: LocalTopicFormData = {
   modules: [],
   isFree: true,
   price: '0',
+  displayOrder: 0,
   tags: [],
   status: 'draft',
   targetAudience: [],
@@ -213,7 +215,7 @@ export default function NewTopicPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [autoSaveEnabled, setAutoSaveEnabled] = useState(true);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
-  
+
   // Category and subcategory state
   const [categories, setCategories] = useState<CategoryData[]>([]);
   const [availableSubcategories, setAvailableSubcategories] = useState<any[]>([]);
@@ -244,7 +246,7 @@ export default function NewTopicPage() {
       toast.error('Please select a category first');
       return;
     }
-    
+
     setLoadingSubcategories(true);
     console.log('🔄 Refreshing subcategories for category:', formData.category);
     try {
@@ -263,7 +265,7 @@ export default function NewTopicPage() {
   // Auto-save functionality
   const autoSave = async () => {
     if (!autoSaveEnabled || !formData.title) return;
-    
+
     try {
       // Convert local form data to API format
       const apiModules: ImportedModule[] = formData.modules.map(module => ({
@@ -275,17 +277,17 @@ export default function NewTopicPage() {
         }))
       }));
 
-      const draftData: CreateTopicRequest = { 
-        ...formData, 
+      const draftData: CreateTopicRequest = {
+        ...formData,
         status: 'draft',
         difficulty: formData.difficulty as 'beginner' | 'intermediate' | 'advanced' | 'expert' || 'beginner',
         modules: apiModules
       };
-      
+
       // Only auto-save if we have a title
       if (draftData.title) {
         const result = await apiService.post(API_ENDPOINTS.TOPICS.CREATE, draftData);
-        
+
         if (result.success) {
           setLastSaved(new Date());
           toast.success('Draft auto-saved', { duration: 1000 });
@@ -299,7 +301,7 @@ export default function NewTopicPage() {
   // Auto-save every 2 minutes
   React.useEffect(() => {
     if (!autoSaveEnabled) return;
-    
+
     const interval = setInterval(autoSave, 120000); // 2 minutes
     return () => clearInterval(interval);
   }, [formData, autoSaveEnabled]);
@@ -317,7 +319,7 @@ export default function NewTopicPage() {
         toast.error('Failed to load categories');
       }
     };
-    
+
     loadCategories();
   }, []);
 
@@ -328,7 +330,7 @@ export default function NewTopicPage() {
         try {
           const subcategoriesData = await fetchSubcategories(formData.category);
           setAvailableSubcategories(subcategoriesData);
-          
+
           // Reset subcategory if current one doesn't exist in new category
           const currentSubcategoryExists = subcategoriesData.some(
             (sub: any) => String(sub.id) === String(formData.subcategory)
@@ -384,8 +386,8 @@ export default function NewTopicPage() {
   };
 
   const toggleModuleExpansion = (moduleId: string | number) => {
-    setExpandedModules(prev => 
-      prev.includes(moduleId) 
+    setExpandedModules(prev =>
+      prev.includes(moduleId)
         ? prev.filter(id => id !== moduleId)
         : [...prev, moduleId]
     );
@@ -394,7 +396,7 @@ export default function NewTopicPage() {
   const updateModule = (moduleIndex: number, field: keyof LocalModule, value: any) => {
     setFormData((prev: LocalTopicFormData) => ({
       ...prev,
-      modules: prev.modules.map((module: LocalModule, index: number) => 
+      modules: prev.modules.map((module: LocalModule, index: number) =>
         index === moduleIndex ? { ...module, [field]: value } : module
       )
     }));
@@ -419,11 +421,11 @@ export default function NewTopicPage() {
       thumbnail: '',
       order: formData.modules[moduleIndex].videos.length + 1
     };
-    
+
     setFormData((prev: LocalTopicFormData) => ({
       ...prev,
-      modules: prev.modules.map((module: LocalModule, index: number) => 
-        index === moduleIndex 
+      modules: prev.modules.map((module: LocalModule, index: number) =>
+        index === moduleIndex
           ? { ...module, videos: [...module.videos, newVideo] }
           : module
       )
@@ -433,14 +435,14 @@ export default function NewTopicPage() {
   const updateVideo = (moduleIndex: number, videoIndex: number, field: keyof LocalVideo, value: any) => {
     setFormData((prev: LocalTopicFormData) => ({
       ...prev,
-      modules: prev.modules.map((module: LocalModule, mIndex: number) => 
+      modules: prev.modules.map((module: LocalModule, mIndex: number) =>
         mIndex === moduleIndex
           ? {
-              ...module,
-              videos: module.videos.map((video: LocalVideo, vIndex: number) => 
-                vIndex === videoIndex ? { ...video, [field]: value } : video
-              )
-            }
+            ...module,
+            videos: module.videos.map((video: LocalVideo, vIndex: number) =>
+              vIndex === videoIndex ? { ...video, [field]: value } : video
+            )
+          }
           : module
       )
     }));
@@ -449,7 +451,7 @@ export default function NewTopicPage() {
   const removeVideo = (moduleIndex: number, videoIndex: number) => {
     setFormData((prev: LocalTopicFormData) => ({
       ...prev,
-      modules: prev.modules.map((module: LocalModule, mIndex: number) => 
+      modules: prev.modules.map((module: LocalModule, mIndex: number) =>
         mIndex === moduleIndex
           ? { ...module, videos: module.videos.filter((_: LocalVideo, vIndex: number) => vIndex !== videoIndex) }
           : module
@@ -461,7 +463,7 @@ export default function NewTopicPage() {
   const addMultipleVideos = (moduleIndex: number, count: number) => {
     const newVideos: LocalVideo[] = [];
     const currentVideoCount = formData.modules[moduleIndex].videos.length;
-    
+
     for (let i = 0; i < count; i++) {
       newVideos.push({
         id: `new-${Date.now()}-${i}`,
@@ -474,11 +476,11 @@ export default function NewTopicPage() {
         order: currentVideoCount + i + 1
       });
     }
-    
+
     setFormData((prev: LocalTopicFormData) => ({
       ...prev,
-      modules: prev.modules.map((module: LocalModule, index: number) => 
-        index === moduleIndex 
+      modules: prev.modules.map((module: LocalModule, index: number) =>
+        index === moduleIndex
           ? { ...module, videos: [...module.videos, ...newVideos] }
           : module
       )
@@ -488,7 +490,7 @@ export default function NewTopicPage() {
   // Bulk File Upload
   const handleBulkVideoUpload = async (moduleIndex: number, files: FileList) => {
     const videoFiles = Array.from(files).filter(file => file.type.startsWith('video/'));
-    
+
     if (videoFiles.length === 0) {
       toast.error('Please select valid video files');
       return;
@@ -504,7 +506,7 @@ export default function NewTopicPage() {
     // Create new video entries for each file
     const newVideos: LocalVideo[] = [];
     const currentVideoCount = formData.modules[moduleIndex].videos.length;
-    
+
     videoFiles.forEach((file, index) => {
       newVideos.push({
         id: `new-${Date.now()}-${index}`,
@@ -517,11 +519,11 @@ export default function NewTopicPage() {
         order: currentVideoCount + index + 1
       });
     });
-    
+
     setFormData((prev: LocalTopicFormData) => ({
       ...prev,
-      modules: prev.modules.map((module: LocalModule, index: number) => 
-        index === moduleIndex 
+      modules: prev.modules.map((module: LocalModule, index: number) =>
+        index === moduleIndex
           ? { ...module, videos: [...module.videos, ...newVideos] }
           : module
       )
@@ -553,7 +555,7 @@ export default function NewTopicPage() {
         order: 1,
         videos: []
       };
-      
+
       setFormData((prev: LocalTopicFormData) => ({
         ...prev,
         modules: [newModule]
@@ -577,7 +579,7 @@ export default function NewTopicPage() {
           videos: [...updatedModules[targetModuleIndex].videos, ...newVideos]
         };
       }
-      
+
       return {
         ...prev,
         modules: updatedModules
@@ -630,7 +632,7 @@ export default function NewTopicPage() {
             videos: [...updatedModules[moduleIndex].videos, ...newVideos]
           };
         }
-        
+
         return {
           ...prev,
           modules: updatedModules
@@ -655,13 +657,13 @@ export default function NewTopicPage() {
       // Update local state immediately for UI feedback
       updateVideo(moduleIndex, videoIndex, 'videoFile', file);
       updateVideo(moduleIndex, videoIndex, 'title', file.name.replace(/\.[^/.]+$/, ""));
-      
+
       // Create preview URL for immediate feedback
       const previewUrl = URL.createObjectURL(file);
       updateVideo(moduleIndex, videoIndex, 'videoUrl', previewUrl);
-      
+
       toast.info('Video file ready for upload. Save the topic to finalize.');
-      
+
     } catch (error) {
       console.error('Error handling video file:', error);
       toast.error('Failed to process video file');
@@ -677,9 +679,9 @@ export default function NewTopicPage() {
   };
 
   const removeTag = (tagToRemove: string) => {
-    setFormData((prev: LocalTopicFormData) => ({ 
-      ...prev, 
-      tags: prev.tags.filter((tag: string) => tag !== tagToRemove) 
+    setFormData((prev: LocalTopicFormData) => ({
+      ...prev,
+      tags: prev.tags.filter((tag: string) => tag !== tagToRemove)
     }));
   };
 
@@ -709,7 +711,7 @@ export default function NewTopicPage() {
     console.log('💾 Starting topic creation process...');
     console.log('📋 Create status:', status);
     console.log('📋 Current form data before create:', JSON.stringify(formData, null, 2));
-    
+
     try {
       // Validate difficulty is set
       if (!formData.difficulty) {
@@ -739,7 +741,7 @@ export default function NewTopicPage() {
           setIsLoading(false);
           return;
         }
-        
+
         // Modules are optional, but if they exist, they should have proper structure
         if (formData.modules.length > 0) {
           // Check if modules have titles
@@ -783,10 +785,10 @@ export default function NewTopicPage() {
         }
 
         // Only include URL-based videos in initial creation
-        const urlBasedVideos = module.videos.filter(video => 
-          !video.videoFile && 
-          video.videoUrl && 
-          !video.videoUrl.startsWith('blob:') && 
+        const urlBasedVideos = module.videos.filter(video =>
+          !video.videoFile &&
+          video.videoUrl &&
+          !video.videoUrl.startsWith('blob:') &&
           !video.uploadedUrl &&
           (video.videoUrl.includes('youtube.com') || video.videoUrl.includes('youtu.be') || video.videoUrl.startsWith('http'))
         );
@@ -814,13 +816,13 @@ export default function NewTopicPage() {
       });
 
       // Convert local form data to API format for initial creation
-      const initialData: CreateTopicRequest = { 
-        ...formData, 
+      const initialData: CreateTopicRequest = {
+        ...formData,
         status,
         difficulty: formData.difficulty as 'beginner' | 'intermediate' | 'advanced' | 'expert',
         modules: initialModules
       };
-      
+
       console.log('📤 Initial data being sent to API for creation:');
       console.log('📤 Topic title:', initialData.title);
       console.log('📤 Modules being created:', initialData.modules.map(m => ({
@@ -848,7 +850,7 @@ export default function NewTopicPage() {
         order: m.order,
         orderIndex: m.orderIndex
       })) || 'No modules in response');
-      
+
       if (!result.success) {
         console.error('❌ API returned error:', result);
         toast.error(result.error || 'Failed to create topic. Please try again.');
@@ -861,8 +863,8 @@ export default function NewTopicPage() {
 
       // STEP 2: Now handle video uploads for modules that have file-based videos
       console.log('🎬 Starting video upload process...');
-      
-      const modulesWithVideoUploads = formData.modules.filter(module => 
+
+      const modulesWithVideoUploads = formData.modules.filter(module =>
         module.videos.some(video => video.videoFile && !video.uploadedUrl)
       );
 
@@ -902,7 +904,7 @@ export default function NewTopicPage() {
           });
 
           // Find the corresponding created module - try multiple matching strategies
-          let createdModule = createdModules.find((cm: any) => 
+          let createdModule = createdModules.find((cm: any) =>
             cm.title === module.title && cm.order === module.order
           );
 
@@ -926,7 +928,7 @@ export default function NewTopicPage() {
               console.log(`🔄 Fallback 3: Matching by index ${moduleIndex} for "${module.title}":`, createdModule ? 'Found' : 'Not found');
             }
           }
-          
+
           if (!createdModule) {
             console.error(`❌ Could not find created module for: ${module.title}`);
             console.error(`❌ Available modules on server:`, createdModules.map((cm: any) => `"${cm.title}" (order: ${cm.order})`));
@@ -940,10 +942,10 @@ export default function NewTopicPage() {
 
           // Get videos that need uploading
           const videosToUpload = module.videos.filter(video => video.videoFile && !video.uploadedUrl);
-          const urlBasedVideos = module.videos.filter(video => 
-            !video.videoFile && 
-            video.videoUrl && 
-            !video.videoUrl.startsWith('blob:') && 
+          const urlBasedVideos = module.videos.filter(video =>
+            !video.videoFile &&
+            video.videoUrl &&
+            !video.videoUrl.startsWith('blob:') &&
             !video.uploadedUrl &&
             (video.videoUrl.includes('youtube.com') || video.videoUrl.includes('youtu.be') || video.videoUrl.startsWith('http'))
           );
@@ -951,14 +953,14 @@ export default function NewTopicPage() {
           // Upload file-based videos
           if (videosToUpload.length > 0) {
             console.log(`📤 Uploading ${videosToUpload.length} file-based videos for module: ${module.title}`);
-            
+
             try {
               // Check file sizes before upload
               const MAX_FILE_SIZE = 500 * 1024 * 1024; // 500MB per file
-              const oversizedVideos = videosToUpload.filter(video => 
+              const oversizedVideos = videosToUpload.filter(video =>
                 video.videoFile && video.videoFile.size > MAX_FILE_SIZE
               );
-              
+
               if (oversizedVideos.length > 0) {
                 console.error(`❌ Oversized videos in module ${module.title}:`, oversizedVideos.map(v => ({
                   title: v.title,
@@ -969,7 +971,7 @@ export default function NewTopicPage() {
               }
 
               const formDataPayload = new FormData();
-              
+
               videosToUpload.forEach((video, index) => {
                 if (video.videoFile) {
                   formDataPayload.append('videos', video.videoFile);
@@ -987,7 +989,7 @@ export default function NewTopicPage() {
                 titles: videosToUpload.map(v => v.title),
                 fileSizes: videosToUpload.map(v => v.videoFile ? `${(v.videoFile.size / 1024 / 1024).toFixed(2)}MB` : 'Unknown')
               });
-              
+
               // Show upload start notification
               toast.info(`Uploading ${videosToUpload.length} video(s) for ${module.title}...`);
 
@@ -1017,7 +1019,7 @@ export default function NewTopicPage() {
           // Create URL-based videos
           if (urlBasedVideos.length > 0) {
             console.log(`� Creating ${urlBasedVideos.length} URL-based videos for module: ${module.title}`);
-            
+
             for (const urlVideo of urlBasedVideos) {
               try {
                 const videoPayload = {
@@ -1082,16 +1084,16 @@ export default function NewTopicPage() {
                 <div className='space-y-2'>
                   <Label htmlFor='title'>Topic Title *</Label>
                   <div className="flex gap-2">
-                    <Input 
-                      id='emoji' 
+                    <Input
+                      id='emoji'
                       className="w-14 text-center text-lg h-9"
                       placeholder='🔐'
                       value={formData.emoji}
                       onChange={(e) => setFormData(prev => ({ ...prev, emoji: e.target.value }))}
                     />
                     <div className="flex-1 space-y-1">
-                      <Input 
-                        id='title' 
+                      <Input
+                        id='title'
                         className={`h-9 ${!formData.title ? 'border-red-300 focus:border-red-500' : ''}`}
                         placeholder='e.g., What is Basic Cybersecurity?'
                         value={formData.title}
@@ -1103,7 +1105,7 @@ export default function NewTopicPage() {
                     </div>
                   </div>
                 </div>
-                
+
                 {/* Category Row - Compact */}
                 <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                   <div className='space-y-2'>
@@ -1125,8 +1127,8 @@ export default function NewTopicPage() {
                         <span className="ml-1">Refresh</span>
                       </Button>
                     </div>
-                    <Select 
-                      value={formData.category} 
+                    <Select
+                      value={formData.category}
                       onValueChange={(value) => {
                         console.log('🏷️ Category selected:', value);
                         console.log('🏷️ Selected category details:', categories.find(cat => String(cat.id) === value));
@@ -1174,8 +1176,8 @@ export default function NewTopicPage() {
                         <span className="ml-1">Refresh</span>
                       </Button>
                     </div>
-                    <Select 
-                      value={formData.subcategory} 
+                    <Select
+                      value={formData.subcategory}
                       onValueChange={(value) => {
                         console.log('🏷️ Subcategory selected:', value);
                         console.log('🏷️ Selected subcategory details:', availableSubcategories.find(sub => String(sub.id) === value));
@@ -1185,21 +1187,21 @@ export default function NewTopicPage() {
                     >
                       <SelectTrigger className="h-9 w-full">
                         <SelectValue placeholder={
-                          !formData.category 
-                            ? 'Select category first' 
-                            : availableSubcategories.length === 0 
-                            ? 'No subcategories available'
-                            : 'Select sub-category'
+                          !formData.category
+                            ? 'Select category first'
+                            : availableSubcategories.length === 0
+                              ? 'No subcategories available'
+                              : 'Select sub-category'
                         } />
                       </SelectTrigger>
                       <SelectContent>
                         {availableSubcategories.length === 0 ? (
                           <SelectItem value="empty" disabled>
-                            {!formData.category 
-                              ? 'Select category first' 
-                              : loadingSubcategories 
-                              ? 'Loading subcategories...'
-                              : 'No subcategories available'}
+                            {!formData.category
+                              ? 'Select category first'
+                              : loadingSubcategories
+                                ? 'Loading subcategories...'
+                                : 'No subcategories available'}
                           </SelectItem>
                         ) : (
                           availableSubcategories.map((subcategory) => (
@@ -1217,9 +1219,9 @@ export default function NewTopicPage() {
                 <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                   <div className='space-y-2'>
                     <Label htmlFor='difficulty'>Difficulty Level *</Label>
-                    <Select 
-                      value={formData.difficulty} 
-                      onValueChange={(value: 'beginner' | 'intermediate' | 'advanced' | 'expert') => 
+                    <Select
+                      value={formData.difficulty}
+                      onValueChange={(value: 'beginner' | 'intermediate' | 'advanced' | 'expert') =>
                         setFormData(prev => ({ ...prev, difficulty: value }))
                       }
                     >
@@ -1240,14 +1242,35 @@ export default function NewTopicPage() {
 
                   <div className='space-y-2'>
                     <Label htmlFor='duration'>Duration (hours)</Label>
-                    <Input 
-                      id='duration' 
+                    <Input
+                      id='duration'
                       type="number"
                       step="0.5"
                       min="0"
                       placeholder='e.g., 2.5'
                       value={formData.duration}
                       onChange={(e) => setFormData(prev => ({ ...prev, duration: e.target.value }))}
+                      className="h-9"
+                    />
+                  </div>
+                </div>
+
+                {/* Display Order */}
+                <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                  <div className='space-y-2'>
+                    <Label htmlFor='displayOrder'>Display Order</Label>
+                    <Input
+                      id='displayOrder'
+                      type="number"
+                      min="0"
+                      placeholder='e.g., 1'
+                      value={formData.displayOrder}
+                      onChange={(e) => setFormData(prev => ({ ...prev, displayOrder: e.target.value === '' ? 0 : parseInt(e.target.value) }))}
+                      onKeyDown={(e) => {
+                        if (['.', 'e', 'E', '-', '+'].includes(e.key)) {
+                          e.preventDefault();
+                        }
+                      }}
                       className="h-9"
                     />
                   </div>
@@ -1305,7 +1328,7 @@ export default function NewTopicPage() {
 
               </CardContent>
             </Card>
-          </div>
+          </div >
         );
 
       case 2:
@@ -1319,7 +1342,7 @@ export default function NewTopicPage() {
                     Modules & Videos ({formData.modules.length})
                   </div>
                   <div className="flex items-center gap-2">
-                    <VideoUploadModal 
+                    <VideoUploadModal
                       onVideoUpload={handleQuickVideoUpload}
                       trigger={
                         <Button variant="outline" size="sm">
@@ -1346,7 +1369,7 @@ export default function NewTopicPage() {
                         <Plus className="h-4 w-4 mr-2" />
                         Add First Module
                       </Button>
-                      <VideoUploadModal 
+                      <VideoUploadModal
                         onVideoUpload={handleQuickVideoUpload}
                         trigger={
                           <Button variant="outline">
@@ -1393,8 +1416,8 @@ export default function NewTopicPage() {
                                   </div>
                                 </div>
                                 <div className="flex items-center gap-1">
-                                  <Button 
-                                    variant="ghost" 
+                                  <Button
+                                    variant="ghost"
                                     size="sm"
                                     onClick={(e) => {
                                       e.stopPropagation();
@@ -1413,7 +1436,7 @@ export default function NewTopicPage() {
                               </div>
                             </CardHeader>
                           </CollapsibleTrigger>
-                          
+
                           <CollapsibleContent>
                             <CardContent className="pt-0 px-3 pb-3">
                               <div className="space-y-3">
@@ -1421,17 +1444,17 @@ export default function NewTopicPage() {
                                 <div className="grid grid-cols-1 lg:grid-cols-5 gap-3">
                                   <div className="lg:col-span-4 space-y-1">
                                     <Label className="text-xs font-medium">Module Title *</Label>
-                                    <Input 
+                                    <Input
                                       placeholder="e.g., Introduction to Cybersecurity Fundamentals"
                                       value={module.title}
                                       onChange={(e) => updateModule(moduleIndex, 'title', e.target.value)}
                                       className="h-8 text-sm"
                                     />
                                   </div>
-                                  
+
                                   <div className="space-y-1">
                                     <Label className="text-xs font-medium">Order</Label>
-                                    <Input 
+                                    <Input
                                       type="number"
                                       min="1"
                                       value={module.order}
@@ -1458,12 +1481,12 @@ export default function NewTopicPage() {
                                       <PlayCircle className="h-4 w-4 text-primary" />
                                       <h4 className="text-sm font-medium">Videos ({module.videos.length})</h4>
                                     </div>
-                                    
+
                                     {/* Single Add Videos Button */}
                                     <VideoUploadModal
                                       trigger={
-                                        <Button 
-                                          variant="outline" 
+                                        <Button
+                                          variant="outline"
                                           size="sm"
                                           className="h-7 px-3 text-xs bg-primary/5 hover:bg-primary/10 border-primary/20"
                                         >
@@ -1490,22 +1513,22 @@ export default function NewTopicPage() {
                                           <div key={video.id} className="group relative">
                                             <div className="aspect-video bg-gray-100 rounded border flex items-center justify-center relative overflow-hidden">
                                               {video.videoUrl ? (
-                                                <video 
-                                                  src={video.videoUrl} 
+                                                <video
+                                                  src={video.videoUrl}
                                                   className="w-full h-full object-cover"
                                                   muted
                                                   preload="metadata"
                                                 />
                                               ) : video.thumbnail ? (
-                                                <img 
-                                                  src={video.thumbnail} 
+                                                <img
+                                                  src={video.thumbnail}
                                                   alt={video.title}
                                                   className="w-full h-full object-cover"
                                                 />
                                               ) : (
                                                 <Video className="h-4 w-4 text-gray-400" />
                                               )}
-                                              
+
                                               {/* Hover actions */}
                                               <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                                 <div className="flex gap-1">
@@ -1531,13 +1554,13 @@ export default function NewTopicPage() {
                                                   </Button>
                                                 </div>
                                               </div>
-                                              
+
                                               {/* Video order */}
                                               <div className="absolute top-1 right-1 bg-black/70 text-white text-xs px-1 rounded">
                                                 {video.order || videoIndex + 1}
                                               </div>
                                             </div>
-                                            
+
                                             {/* Video title */}
                                             <p className="text-xs text-gray-600 mt-1 truncate text-center">
                                               {video.title || `Video ${videoIndex + 1}`}
@@ -1595,7 +1618,7 @@ export default function NewTopicPage() {
                 <div className='space-y-4'>
                   <Label>Tags</Label>
                   <div className='flex gap-2'>
-                    <Input 
+                    <Input
                       placeholder='Add tag (e.g., cybersecurity, passwords, 2FA)'
                       value={newTag}
                       onChange={(e) => setNewTag(e.target.value)}
@@ -1610,8 +1633,8 @@ export default function NewTopicPage() {
                     {formData.tags.map((tag, index) => (
                       <Badge key={index} variant='secondary' className='px-3 py-1'>
                         {tag}
-                        <X 
-                          className='ml-2 h-3 w-3 cursor-pointer hover:text-red-500' 
+                        <X
+                          className='ml-2 h-3 w-3 cursor-pointer hover:text-red-500'
                           onClick={() => removeTag(tag)}
                         />
                       </Badge>
@@ -1645,21 +1668,21 @@ export default function NewTopicPage() {
                     <Switch
                       id='isFree'
                       checked={formData.isFree}
-                      onCheckedChange={(checked) => setFormData(prev => ({ 
-                        ...prev, 
+                      onCheckedChange={(checked) => setFormData(prev => ({
+                        ...prev,
                         isFree: checked,
                         price: checked ? '0' : prev.price
                       }))
                       }
                     />
                   </div>
-                  
+
                   {!formData.isFree && (
                     <div className='space-y-2'>
                       <Label htmlFor='price'>Price ($)</Label>
-                      <Input 
-                        id='price' 
-                        type='number' 
+                      <Input
+                        id='price'
+                        type='number'
                         step='0.01'
                         placeholder='29.99'
                         value={formData.price}
@@ -1668,7 +1691,7 @@ export default function NewTopicPage() {
                       />
                     </div>
                   )}
-                  
+
                   <div className='flex items-center justify-between p-4 border rounded-lg'>
                     <div className="space-y-1">
                       <Label htmlFor='featured' className="font-medium">⭐ Featured Topic</Label>
@@ -1691,7 +1714,7 @@ export default function NewTopicPage() {
                 <CardContent className="space-y-4">
                   <div className='space-y-2'>
                     <Label htmlFor='thumbnail'>Thumbnail Image URL</Label>
-                    <Input 
+                    <Input
                       id='thumbnail'
                       placeholder='https://example.com/thumbnail.jpg'
                       value={formData.thumbnail}
@@ -1699,10 +1722,10 @@ export default function NewTopicPage() {
                       }
                     />
                   </div>
-                  
+
                   <div className='space-y-2'>
                     <Label htmlFor='metaTitle'>Meta Title</Label>
-                    <Input 
+                    <Input
                       id='metaTitle'
                       placeholder='SEO title (auto-filled from topic title)'
                       value={formData.metaTitle}
@@ -1713,7 +1736,7 @@ export default function NewTopicPage() {
                       {formData.metaTitle.length}/60 characters
                     </p>
                   </div>
-                  
+
                   <div className='space-y-2'>
                     <Label htmlFor='metaDescription'>Meta Description</Label>
                     <RichTextEditor
@@ -1751,7 +1774,7 @@ export default function NewTopicPage() {
       )}
       <div className='space-y-6'>
         <Breadcrumbs />
-        
+
         <div className='flex items-center justify-between'>
           <div>
             <h1 className='text-3xl font-bold tracking-tight'>Create New Topic</h1>
@@ -1791,7 +1814,7 @@ export default function NewTopicPage() {
             <div className="space-y-1">
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">Step {currentStep} of {STEPS.length}</span>
-              </div> 
+              </div>
               {/* Step Indicators */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 overflow-x-auto">
@@ -1800,13 +1823,12 @@ export default function NewTopicPage() {
                     return (
                       <div
                         key={step.id}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm cursor-pointer transition-colors whitespace-nowrap ${
-                          currentStep === step.id
-                            ? 'bg-primary text-primary-foreground'
-                            : currentStep > step.id
+                        className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm cursor-pointer transition-colors whitespace-nowrap ${currentStep === step.id
+                          ? 'bg-primary text-primary-foreground'
+                          : currentStep > step.id
                             ? 'bg-green-100 text-green-700'
                             : 'bg-gray-100 text-gray-500'
-                        }`}
+                          }`}
                         onClick={() => setCurrentStep(step.id)}
                       >
                         <Icon className="h-4 w-4" />
@@ -1836,13 +1858,13 @@ export default function NewTopicPage() {
                 <ChevronLeft className="mr-2 h-4 w-4" />
                 Previous
               </Button>
-              
+
               <div className="text-center">
                 <p className="text-sm text-muted-foreground">
                   {STEPS[currentStep - 1]?.description}
                 </p>
               </div>
-              
+
               <div className="flex gap-3">
                 {currentStep === STEPS.length ? (
                   <>
