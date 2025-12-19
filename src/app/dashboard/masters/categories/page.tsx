@@ -20,8 +20,11 @@ interface Category {
   name: string;
   description: string;
   topicsCount: number;
-  price: number;
-  displayOrder: number;
+  price:number;
+  priority?: number;
+  subscription_plan_id: number;
+  plan_type?: 'BUNDLE' | 'FLEXIBLE' | 'INDIVIDUAL' | 'FREE';
+  bundle_price?: number;
   status: 'Active' | 'Draft' | 'Inactive';
   createdAt: string;
   updatedAt?: string;
@@ -210,6 +213,21 @@ export default function CategoriesPage() {
     }
   };
 
+  const getPlanTypeColor = (planType?: string) => {
+    switch (planType?.toUpperCase()) {
+      case 'BUNDLE':
+        return 'bg-orange-100 text-orange-800';
+      case 'FLEXIBLE':
+        return 'bg-blue-100 text-blue-800';
+      case 'INDIVIDUAL':
+        return 'bg-purple-100 text-purple-800';
+      case 'FREE':
+        return 'bg-green-100 text-green-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
+
   return (
     <PageContainer>
       <div className='space-y-4'>
@@ -336,7 +354,22 @@ export default function CategoriesPage() {
                       <div>
                         <p className='font-medium'>{category.name}</p>
                         <p className='text-sm text-muted-foreground'>{category.description}</p>
-                        <p className='text-sm text-muted-foreground'>Price:{category.price} ₹</p>
+                        <div className='flex items-center space-x-2'>
+                          {category.plan_type && (
+                            <Badge className={getPlanTypeColor(category.plan_type)}>
+                              {category.plan_type}
+                            </Badge>
+                          )}
+                          {category.plan_type === 'BUNDLE' || category.plan_type === 'FLEXIBLE' ? (
+                            <p className='text-sm text-muted-foreground'>Bundle: ₹{category.bundle_price || 'N/A'}</p>
+                          ) : category.plan_type === 'INDIVIDUAL' ? (
+                            <p className='text-sm text-muted-foreground'>Topic-wise pricing</p>
+                          ) : category.plan_type === 'FREE' ? (
+                            <p className='text-sm text-muted-foreground'>Free</p>
+                          ) : (
+                            <p className='text-sm text-muted-foreground'>Price: ₹{category.price}</p>
+                          )}
+                        </div>
                         <p className='text-xs text-muted-foreground'>
                           Created: {category.createdAt ? formatDate(category.createdAt, {
                             month: 'short',
@@ -349,9 +382,16 @@ export default function CategoriesPage() {
                     <div className='flex items-center space-x-4'>
                       <div className='text-right'>
                         <p className='text-sm font-medium'>{category.topicsCount} topics</p>
-                        <Badge className={getStatusColor(category.status)}>
-                          {category.status}
-                        </Badge>
+                        <div className='flex items-center space-x-2 mt-1'>
+                          <Badge className={getStatusColor(category.status)}>
+                            {category.status}
+                          </Badge>
+                          {category.priority !== undefined && (
+                            <Badge variant="outline" className='text-xs'>
+                              Priority: {category.priority}
+                            </Badge>
+                          )}
+                        </div>
                       </div>
                       <div className='flex space-x-2'>
                         <Button

@@ -193,6 +193,19 @@ export const API_ENDPOINTS = {
         VALIDATE_COUPON: 'combo-topics/validate-coupon',
         STATS: 'combo-topics/stats',
     },
+
+    // Subscription Plans endpoints
+    SUBSCRIPTION_PLANS: {
+        BASE: 'features-plans',
+        BY_ID: (id: string | number) => `features-plans/${id}`,
+        CREATE: 'features-plans',
+        UPDATE: (id: string | number) => `features-plans/${id}`,
+        DELETE: (id: string | number) => `features-plans/${id}`,
+        BULK_DELETE: 'features-plans/bulk-delete',
+        SEARCH: 'features-plans/search',
+        ACTIVE: 'features-plans/active',
+        STATS: 'features-plans/stats',
+    },
 } as const;
 
 // Helper function to build complete URL

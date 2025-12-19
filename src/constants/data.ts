@@ -93,8 +93,13 @@ export const navItems: NavItem[] = [
         url: '/dashboard/masters/privacy',
         icon: 'shield',
         shortcut: ['p', 'r']
-      } 
-    
+      },
+      {
+        title: 'Our Plans',
+        url: '/dashboard/masters/subscription-plans',
+        icon: 'creditCard',
+        shortcut: ['o', 'p']
+      }
     ]
   },
   {
