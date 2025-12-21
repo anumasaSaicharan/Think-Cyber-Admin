@@ -20,7 +20,7 @@ interface Category {
   name: string;
   description: string;
   topicsCount: number;
-  price:number;
+  price: number;
   priority?: number;
   subscription_plan_id: number;
   plan_type?: 'BUNDLE' | 'FLEXIBLE' | 'INDIVIDUAL' | 'FREE';
@@ -76,7 +76,7 @@ export default function CategoriesPage() {
           createdAt: cat.created_at,
           updatedAt: cat.updated_at,
           topicsCount: cat.topics_count,
-          displayOrder: cat.display_order
+          priority: cat.display_order
         }));
         setCategories(categoriesData as Category[]);
 
@@ -116,7 +116,7 @@ export default function CategoriesPage() {
         // Create snake_case payload for API
         const apiPayload = {
           ...categoryData,
-          display_order: categoryData.displayOrder
+          display_order: categoryData.priority
         };
 
         const result = await apiService.put(
@@ -138,7 +138,7 @@ export default function CategoriesPage() {
         // Create snake_case payload for API
         const apiPayload = {
           ...categoryData,
-          display_order: categoryData.displayOrder
+          display_order: categoryData.priority
         };
 
         const result = await apiService.post(API_ENDPOINTS.CATEGORIES.BASE, apiPayload);

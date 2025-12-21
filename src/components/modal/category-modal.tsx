@@ -90,19 +90,19 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
   // Helper function: Get plan type from selected plan
   const getSelectedPlanType = (): string | undefined => {
     if (!formData.subscription_plan_id) return undefined;
-    
+
     // First try to use stored plan_type
     if (formData.plan_type) {
       return formData.plan_type;
     }
-    
+
     // Fallback to lookup from plans array
     const selectedPlan = subscriptionPlans.find(p => p.id === formData.subscription_plan_id);
     if (selectedPlan) {
       console.log('Found plan:', selectedPlan.name, 'Type:', selectedPlan.plan_type);
       return selectedPlan.plan_type;
     }
-    
+
     console.warn('Plan not found. ID:', formData.subscription_plan_id, 'Available plans:', subscriptionPlans);
     return undefined;
   };
@@ -129,11 +129,11 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
     try {
       setPlansLoading(true);
       const response = await apiService.get<any>(
-            API_ENDPOINTS.SUBSCRIPTION_PLANS.ACTIVE
-          );
-      
+        API_ENDPOINTS.SUBSCRIPTION_PLANS.ACTIVE
+      );
+
       let plansData = [];
-      
+
       if (response.success && Array.isArray(response.data)) {
         console.log('Plans from API:', response.data);
         plansData = response.data;
@@ -142,13 +142,13 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
         console.log('Plans from API (direct array):', response);
         plansData = response;
       }
-      
+
       // Map plans to include plan_type based on name
       const mappedPlans = plansData.map((plan: any) => ({
         ...plan,
         plan_type: plan.plan_type || getPlanTypeFromName(plan.name)
       }));
-      
+
       console.log('Mapped plans with types:', mappedPlans);
       setSubscriptionPlans(mappedPlans);
     } catch (error) {
@@ -216,8 +216,8 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
       newErrors.price = 'Price must be a positive number';
     }
 
-    if (formData.displayOrder < 0 || !Number.isInteger(Number(formData.displayOrder))) {
-      newErrors.displayOrder = 'Display order must be a non-negative integer';
+    if ((formData.priority || 0) < 0 || !Number.isInteger(Number(formData.priority || 0))) {
+      newErrors.priority = 'Priority must be a non-negative integer';
     }
 
     if (!formData.status) {
@@ -281,17 +281,17 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
         subscription_plan_id: formData.subscription_plan_id,
         plan_type: planType,
       } as any;
-      
+
       // Only include bundle_price if BUNDLE or FLEXIBLE
       if (planType === 'BUNDLE' || planType === 'FLEXIBLE') {
         payload.bundle_price = formData.bundle_price || 0;
       }
-      
+
       // Only include topic_prices if INDIVIDUAL or FLEXIBLE
       if (planType === 'INDIVIDUAL' || planType === 'FLEXIBLE') {
         payload.topic_prices = formData.topic_prices || {};
       }
-      
+
       await onSave(payload);
       onClose();
     } catch (error) {
@@ -374,7 +374,7 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
             <p className="text-xs text-gray-500">Use Bundle Price or Topic Prices instead</p>
           </div>
         )}
-  
+
         {/* Subscription Plan Selection */}
         <div className="space-y-4 border-t pt-4">
           <div>
@@ -392,11 +392,10 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
               {subscriptionPlans.map((plan) => (
                 <div
                   key={plan.id}
-                  className={`border rounded-lg p-3 cursor-pointer transition-all ${
-                    formData.subscription_plan_id === plan.id
+                  className={`border rounded-lg p-3 cursor-pointer transition-all ${formData.subscription_plan_id === plan.id
                       ? 'border-blue-500 bg-blue-50 ring-2 ring-blue-200'
                       : 'border-gray-200 hover:border-gray-300'
-                  }`}
+                    }`}
                   onClick={() =>
                     setFormData((prev) => ({
                       ...prev,
@@ -406,11 +405,10 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
                   }
                 >
                   <div className="flex items-start gap-3">
-                    <div className={`w-5 h-5 rounded border mt-0.5 flex items-center justify-center flex-shrink-0 ${
-                      formData.subscription_plan_id === plan.id
+                    <div className={`w-5 h-5 rounded border mt-0.5 flex items-center justify-center flex-shrink-0 ${formData.subscription_plan_id === plan.id
                         ? 'bg-blue-500 border-blue-500'
                         : 'border-gray-300'
-                    }`}>
+                      }`}>
                       {formData.subscription_plan_id === plan.id && (
                         <Check className="w-3 h-3 text-white" />
                       )}
@@ -418,12 +416,11 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
                         <h3 className="font-semibold text-sm">{plan.name}</h3>
-                        <span className={`px-2 py-0.5 rounded text-xs font-medium ${
-                          plan.plan_type === 'BUNDLE' ? 'bg-orange-100 text-orange-700' :
-                          plan.plan_type === 'FLEXIBLE' ? 'bg-blue-100 text-blue-700' :
-                          plan.plan_type === 'INDIVIDUAL' ? 'bg-purple-100 text-purple-700' :
-                          'bg-green-100 text-green-700'
-                        }`}>
+                        <span className={`px-2 py-0.5 rounded text-xs font-medium ${plan.plan_type === 'BUNDLE' ? 'bg-orange-100 text-orange-700' :
+                            plan.plan_type === 'FLEXIBLE' ? 'bg-blue-100 text-blue-700' :
+                              plan.plan_type === 'INDIVIDUAL' ? 'bg-purple-100 text-purple-700' :
+                                'bg-green-100 text-green-700'
+                          }`}>
                           {plan.plan_type}
                         </span>
                       </div>
@@ -507,7 +504,7 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
           </div>
         )}
 
-         {/* Priority */}
+        {/* Priority */}
         <div className="space-y-2">
           <Label htmlFor="category-priority">Priority (Display Order) *</Label>
           <Input

@@ -69,8 +69,8 @@ export const navItems: NavItem[] = [
         url: '/dashboard/masters/home',
         icon: 'home',
         shortcut: ['h', 'p']
-      }, 
-        {
+      },
+      {
         title: 'Categories',
         url: '/dashboard/masters/categories',
         icon: 'folder',
@@ -81,7 +81,7 @@ export const navItems: NavItem[] = [
         url: '/dashboard/masters/sub-categories',
         icon: 'folderOpen',
         shortcut: ['s', 'c']
-      }, 
+      },
       {
         title: 'Terms and Conditions',
         url: '/dashboard/masters/terms',
@@ -97,7 +97,7 @@ export const navItems: NavItem[] = [
       {
         title: 'Our Plans',
         url: '/dashboard/masters/subscription-plans',
-        icon: 'creditCard',
+        icon: 'billing',
         shortcut: ['o', 'p']
       }
     ]
