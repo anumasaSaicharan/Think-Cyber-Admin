@@ -206,6 +206,30 @@ export const API_ENDPOINTS = {
         ACTIVE: 'features-plans/active',
         STATS: 'features-plans/stats',
     },
+
+    // App Settings endpoints (Force Update)
+    APP_SETTINGS: {
+        BASE: 'app-settings',
+        VERSION: 'app-settings/version',
+        TRIGGER_FORCE_UPDATE: 'app-settings/trigger-force-update',
+        DISABLE_FORCE_UPDATE: 'app-settings/disable-force-update',
+    },
+
+    // Notifications endpoints
+    NOTIFICATIONS: {
+        BASE: 'notifications',
+        REGISTER_TOKEN: 'notifications/register-token',
+        REMOVE_TOKEN: 'notifications/remove-token',
+        DEVICES: 'notifications/devices',
+        HISTORY: 'notifications/history',
+        BROADCAST: 'notifications/broadcast',
+        BROADCAST_HISTORY: 'notifications/broadcast-history',
+        STATS: 'notifications/stats',
+        SEND: 'notifications/send',
+        SEND_MULTIPLE: 'notifications/send-multiple',
+        SUBSCRIBE_TOPIC: 'notifications/subscribe-topic',
+        UNSUBSCRIBE_TOPIC: 'notifications/unsubscribe-topic',
+    },
 } as const;
 
 // Helper function to build complete URL

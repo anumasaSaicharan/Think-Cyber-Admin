@@ -128,6 +128,27 @@ export const navItems: NavItem[] = [
         shortcut: ['i', 'n']
       }
     ]
+  },
+  {
+    title: 'Notifications',
+    url: '#',
+    icon: 'bell',
+    shortcut: ['n', 'n'],
+    isActive: false,
+    items: [
+      {
+        title: 'Send Notification',
+        url: '/dashboard/notifications/send',
+        icon: 'mail',
+        shortcut: ['s', 'n']
+      },
+      {
+        title: 'Force Update',
+        url: '/dashboard/notifications/force-update',
+        icon: 'smartphone',
+        shortcut: ['f', 'u']
+      }
+    ]
   }
 ];
 
