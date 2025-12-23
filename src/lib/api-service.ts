@@ -118,9 +118,11 @@ class ApiService {
         data: data?.data || (Array.isArray(data) ? data : null),
         message: data?.message,
         meta: data?.meta,
-        // Preserve additional properties like stats, categories, etc.
+        // Preserve additional properties like stats, categories, notifications, etc.
         ...(data?.stats && { stats: data.stats }),
-        ...(data?.categories && { categories: data.categories })
+        ...(data?.categories && { categories: data.categories }),
+        ...(data?.notifications && { notifications: data.notifications }),
+        ...(data?.total !== undefined && { total: data.total })
       };
     } catch (error) {
       // ...existing code...

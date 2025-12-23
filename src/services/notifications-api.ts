@@ -181,3 +181,78 @@ export async function sendNotificationToMultiple(
     headers: adminHeaders,
   });
 }
+
+// Filter type for notification history
+export type NotificationFilterType = 'broadcast' | 'personal' | 'all';
+
+export interface UserNotification {
+  id: number;
+  user_id: number | null;
+  title: string;
+  body: string;
+  data: Record<string, any>;
+  type: string;
+  status: string;
+  is_read: boolean;
+  read_at?: string;
+  sent_at?: string;
+  created_at: string;
+  notificationType: 'broadcast';
+}
+
+export interface UserNotificationHistoryResponse {
+  success: boolean;
+  notifications: UserNotification[];
+  pagination: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
+}
+
+/**
+ * Get notification history for a specific user (protected - requires admin key)
+ * @param userId - The user ID to get notifications for
+ * @param filterType - Filter by 'broadcast' (admin broadcasts), 'personal' (individual notifications), or 'all'
+ * @param page - Page number (default: 1)
+ * @param limit - Number of notifications per page (default: 50)
+ */
+export async function getUserNotificationHistory(
+  userId: number,
+  filterType: NotificationFilterType = 'all',
+  page: number = 1,
+  limit: number = 50
+): Promise<ApiResponse<UserNotificationHistoryResponse>> {
+  let url = `${API_ENDPOINTS.NOTIFICATIONS.HISTORY}/${userId}?page=${page}&limit=${limit}`;
+  
+  if (filterType !== 'all') {
+    url += `&filterType=${filterType}`;
+  }
+  
+  return apiService.get<UserNotificationHistoryResponse>(url, {
+    headers: adminHeaders,
+  });
+}
+
+/**
+ * Get only broadcast notifications for a user (admin broadcasts)
+ */
+export async function getUserBroadcastNotifications(
+  userId: number,
+  page: number = 1,
+  limit: number = 50
+): Promise<ApiResponse<UserNotificationHistoryResponse>> {
+  return getUserNotificationHistory(userId, 'broadcast', page, limit);
+}
+
+/**
+ * Get only personal notifications for a user (welcome, enrollment, etc.)
+ */
+export async function getUserPersonalNotifications(
+  userId: number,
+  page: number = 1,
+  limit: number = 50
+): Promise<ApiResponse<UserNotificationHistoryResponse>> {
+  return getUserNotificationHistory(userId, 'personal', page, limit);
+}

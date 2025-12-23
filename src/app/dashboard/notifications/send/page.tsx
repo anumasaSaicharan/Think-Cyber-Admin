@@ -51,12 +51,22 @@ export default function SendNotificationPage() {
         getBroadcastHistory(10)
       ]);
 
-      if (statsResult.success && statsResult.data) {
-        setStats(statsResult.data.stats);
+      console.log('Stats result:', statsResult);
+      console.log('History result:', historyResult);
+      
+      if (statsResult.success) {
+        // Stats can be in statsResult.stats or statsResult.data.stats
+        const statsData = (statsResult as any).stats || statsResult.data?.stats || statsResult.data;
+        if (statsData) {
+          setStats(statsData);
+        }
       }
 
-      if (historyResult.success && historyResult.data) {
-        setHistory(historyResult.data.notifications || []);
+      if (historyResult.success) {
+        // Notifications can be in historyResult.notifications or historyResult.data.notifications
+        const notifications = (historyResult as any).notifications || historyResult.data?.notifications || historyResult.data || [];
+        console.log('Parsed notifications:', notifications);
+        setHistory(Array.isArray(notifications) ? notifications : []);
       }
     } catch (error) {
       console.error('Error fetching data:', error);
