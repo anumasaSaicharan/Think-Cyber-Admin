@@ -815,9 +815,19 @@ export default function NewTopicPage() {
         };
       });
 
+      // Find category and subcategory objects to get names (backend expects names in category/subcategory fields, IDs in categoryId/subcategoryId)
+      const selectedCategory = categories.find(c => String(c.id) === formData.category);
+      const selectedSubcategory = availableSubcategories.find(s => String(s.id) === formData.subcategory);
+
       // Convert local form data to API format for initial creation
       const initialData: CreateTopicRequest = {
         ...formData,
+        categoryId: formData.category,
+        subcategoryId: formData.subcategory,
+        category: selectedCategory?.name || formData.category,
+        subcategory: selectedSubcategory?.name || formData.subcategory,
+        categoryName: selectedCategory?.name,
+        subcategoryName: selectedSubcategory?.name,
         status,
         difficulty: formData.difficulty as 'beginner' | 'intermediate' | 'advanced' | 'expert',
         modules: initialModules

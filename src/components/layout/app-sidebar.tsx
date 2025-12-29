@@ -65,7 +65,7 @@ export default function AppSidebar() {
   const { data: session } = useSession();
   const router = useRouter();
   const isMounted = useIsMounted();
-  
+
   const handleSwitchTenant = (_tenantId: string) => {
     // Tenant switching functionality would be implemented here
   };

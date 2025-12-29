@@ -108,10 +108,10 @@ export default function UsersPage() {
               Manage all users in your educational platform
             </p>
           </div>
-          <Button>
+          {/* <Button>
             <UserPlus className="mr-2 h-4 w-4" />
             Add User
-          </Button>
+          </Button> */}
         </div>
 
         {/* Stats Cards */}
@@ -255,8 +255,8 @@ export default function UsersPage() {
                         <AvatarFallback>
                           {user.name
                             ? user.name.split(' ')
-                                .map((n: string) => n[0])
-                                .join('')
+                              .map((n: string) => n[0])
+                              .join('')
                             : 'U'}
                         </AvatarFallback>
                       </Avatar>

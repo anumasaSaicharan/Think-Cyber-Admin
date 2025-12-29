@@ -21,7 +21,17 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select';
-// Removed lucide-react icon imports to resolve module errors
+import {
+  Plus,
+  FileText,
+  Calendar,
+  RefreshCw,
+  Search,
+  Loader2,
+  Eye,
+  Edit,
+  Trash2
+} from 'lucide-react';
 import { PrivacyModal } from '@/components/modal/privacy-modal';
 import { DeletePrivacyModal } from '@/components/modal/delete-privacy-modal';
 import { RichTextDisplay } from '@/components/ui/rich-text-display';
@@ -127,10 +137,10 @@ export default function PrivacyPage() {
             result.stats?.latestVersion ||
             (privacyData.length > 0
               ? Math.max(
-                  ...privacyData.map(
-                    (policy: PrivacyPolicy) => parseFloat(policy.version) || 1.0
-                  )
-                ).toFixed(1)
+                ...privacyData.map(
+                  (policy: PrivacyPolicy) => parseFloat(policy.version) || 1.0
+                )
+              ).toFixed(1)
               : '1.0')
         };
         setStats(statsData);
@@ -266,7 +276,7 @@ export default function PrivacyPage() {
               onClick={() => setIsAddModalOpen(true)}
               className='flex items-center gap-2'
             >
-              {/* Removed Plus icon due to missing import */}
+              <Plus className='h-4 w-4' />
               Add Privacy Policy
             </Button>
           </div>
@@ -276,7 +286,7 @@ export default function PrivacyPage() {
             <Card>
               <CardContent className='p-6'>
                 <div className='flex items-center space-x-2'>
-                  {/* Removed FileText icon due to missing import */}
+                  <FileText className='h-4 w-4 text-muted-foreground' />
                   <div>
                     <p className='text-muted-foreground text-sm font-medium'>
                       Total
@@ -315,7 +325,7 @@ export default function PrivacyPage() {
             <Card>
               <CardContent className='p-6'>
                 <div className='flex items-center space-x-2'>
-                  {/* Removed Calendar icon due to missing import */}
+                  <Calendar className='h-4 w-4 text-muted-foreground' />
                   <div>
                     <p className='text-muted-foreground text-sm font-medium'>
                       Latest Version
@@ -344,19 +354,21 @@ export default function PrivacyPage() {
                   disabled={loading}
                   className='flex items-center gap-2'
                 >
-                  {/* Removed RefreshCw icon due to missing import */}
+                  <RefreshCw
+                    className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`}
+                  />
                   Refresh
                 </Button>
               </div>
               <div className='flex flex-col gap-4 sm:flex-row'>
                 <div className='flex-1'>
                   <div className='relative'>
-                    {/* Removed Search icon due to missing import */}
+                    <Search className='absolute left-2 top-2.5 h-4 w-4 text-muted-foreground' />
                     <Input
                       placeholder='Search privacy policies...'
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className='pl-10'
+                      className='pl-8'
                     />
                   </div>
                 </div>
@@ -378,12 +390,12 @@ export default function PrivacyPage() {
             <CardContent>
               {loading ? (
                 <div className='flex items-center justify-center py-10'>
-                  {/* Removed Loader2 icon due to missing import */}
+                  <Loader2 className='h-6 w-6 animate-spin text-muted-foreground' />
                   <span className='ml-2'>Loading privacy policies...</span>
                 </div>
               ) : privacyPolicies.length === 0 ? (
                 <div className='py-10 text-center'>
-                  {/* Removed FileText icon due to missing import */}
+                  <FileText className='mx-auto mb-4 h-12 w-12 text-muted-foreground opacity-50' />
                   <p className='text-muted-foreground mb-2 text-lg font-medium'>
                     No privacy policies found
                   </p>
@@ -402,7 +414,7 @@ export default function PrivacyPage() {
                     >
                       <div className='flex items-center space-x-4'>
                         <div className='rounded-lg bg-blue-100 p-2'>
-                          {/* Removed FileText icon due to missing import */}
+                          <FileText className='h-5 w-5 text-blue-600' />
                         </div>
                         <div>
                           <p className='font-medium'>{privacy.title}</p>
@@ -449,7 +461,7 @@ export default function PrivacyPage() {
                               onClick={() => handlePublishPrivacy(privacy.id!)}
                               className='flex items-center gap-1'
                             >
-                              {/* Removed Eye icon due to missing import */}
+                              <Eye className='mr-1 h-3 w-3' />
                               Publish
                             </Button>
                           )}
@@ -461,7 +473,7 @@ export default function PrivacyPage() {
                               setIsEditModalOpen(true);
                             }}
                           >
-                            {/* Removed Edit icon due to missing import */}
+                            <Edit className='h-4 w-4' />
                           </Button>
                           <Button
                             variant='outline'
@@ -471,7 +483,7 @@ export default function PrivacyPage() {
                               setIsDeleteModalOpen(true);
                             }}
                           >
-                            {/* Removed Trash2 icon due to missing import */}
+                            <Trash2 className='h-4 w-4 text-destructive' />
                           </Button>
                         </div>
                       </div>

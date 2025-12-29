@@ -62,7 +62,10 @@ export interface Topic {
 
 export interface TopicFormData extends Omit<Topic, 'id' | 'createdAt' | 'updatedAt' | 'createdBy' | 'updatedBy' | 'isActive' | 'enrollmentCount' | 'rating' | 'reviewCount'> { }
 
-export interface CreateTopicRequest extends TopicFormData { }
+export interface CreateTopicRequest extends TopicFormData {
+  categoryId?: string;
+  subcategoryId?: string;
+}
 
 export interface UpdateTopicRequest extends Partial<TopicFormData> {
   id: string;
