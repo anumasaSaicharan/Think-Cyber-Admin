@@ -9,15 +9,7 @@ import { ChevronDown, RefreshCw, AlertCircle } from 'lucide-react';
 import { dashboardApiService } from '@/services/dashboard-api';
 import { de } from '@faker-js/faker/.';
 
-const defaultEarningsData = [
-  { month: 'Jan', value: 12 },
-  { month: 'Feb', value: 8 },
-  { month: 'Mar', value: 14 },
-  { month: 'Apr', value: 10 },
-  { month: 'May', value: 16 },
-  { month: 'Jun', value: 13 },
-  { month: 'Jul', value: 15 }
-];
+
 
 export function EarningsGraph() {
   const [loading, setLoading] = React.useState(true);
@@ -29,7 +21,7 @@ export function EarningsGraph() {
     debugger;
     setLoading(true);
     setError(null);
-    
+
     try {
       const response = await dashboardApiService.getEarningsData(selectedYear);
       debugger;
@@ -54,26 +46,42 @@ export function EarningsGraph() {
     fetchEarnings();
   };
 
+  // Create dynamic default data for the selected year
+  const defaultEarningsData = React.useMemo(() => {
+    return Array.from({ length: 12 }, (_, i) => {
+      const d = new Date(0, i);
+      return {
+        month: d.toLocaleString('en-US', { month: 'short' }),
+        value: 0
+      };
+    });
+  }, []);
+
+  const years = React.useMemo(() => {
+    const currentYear = new Date().getFullYear();
+    return [currentYear, currentYear - 1, currentYear - 2, currentYear - 3, currentYear - 4];
+  }, []);
+
   // Process API data - response structure: { success, data: [...], summary: {...} }
   const processEarningsData = () => {
     if (!data) return { chartData: defaultEarningsData, totalEarnings: 0, transactionCount: 0 };
-    
+
     // Response structure: response.data is the whole object with 'data' array and 'summary'
     const apiData = Array.isArray(data) ? data : (data.data || data);
     const summary = Array.isArray(data) ? {} : (data.summary || {});
-    
+
     // Use value directly, or count if value is 0
     const processedData = (Array.isArray(apiData) ? apiData : []).map((item: any) => ({
       ...item,
       displayValue: item.value || item.earnings || 0
     }));
-    
+
     // Don't filter - show all months even if they have zero values
     // This ensures all 12 months are always visible
-    
+
     // Calculate total earnings from data if not in summary
     const totalFromData = processedData.reduce((sum: number, item: any) => sum + (item.value || item.earnings || 0), 0);
-    
+
     return {
       chartData: processedData.length > 0 ? processedData : defaultEarningsData,
       totalEarnings: summary.totalEarnings !== undefined ? summary.totalEarnings : totalFromData,
@@ -82,7 +90,7 @@ export function EarningsGraph() {
       monthsIncluded: summary.monthsIncluded || 12
     };
   };
-  
+
   const processedData = processEarningsData();
   const earningsData = processedData.chartData;
   const totalEarnings = processedData.totalEarnings;
@@ -153,19 +161,19 @@ export function EarningsGraph() {
   // Calculate monthly increase
   const calculateMonthlyIncrease = () => {
     if (earningsData.length < 2) return null;
-    
+
     // Get only months with data for comparison
     const dataMonths = earningsData.filter((item: any) => item.displayValue > 0);
     if (dataMonths.length < 2) return null;
-    
+
     const lastMonth = dataMonths[dataMonths.length - 1];
     const previousMonth = dataMonths[dataMonths.length - 2];
     const lastValue = lastMonth.displayValue || 0;
     const prevValue = previousMonth.displayValue || 0;
-    
+
     const increase = lastValue - prevValue;
     const percentChange = prevValue !== 0 ? ((increase / prevValue) * 100) : 0;
-    
+
     return { increase, percentChange, lastMonth: lastMonth.month, prevMonth: previousMonth.month };
   };
 
@@ -183,9 +191,9 @@ export function EarningsGraph() {
                 onChange={(e) => setSelectedYear(Number(e.target.value))}
                 className='text-sm text-muted-foreground bg-transparent border border-gray-300 rounded px-2 py-1 cursor-pointer focus:outline-none focus:ring-2 focus:ring-red-500'
               >
-                <option value={2025}>2025</option>
-                <option value={2024}>2024</option>
-                <option value={2023}>2023</option>
+                {years.map((year) => (
+                  <option key={year} value={year}>{year}</option>
+                ))}
               </select>
               {transactionCount > 0 && (
                 <span className='text-xs text-muted-foreground'>
@@ -194,9 +202,9 @@ export function EarningsGraph() {
               )}
             </div>
           </div>
-          <Button 
-            variant='ghost' 
-            size='sm' 
+          <Button
+            variant='ghost'
+            size='sm'
             onClick={handleRefresh}
             disabled={loading}
             className='h-8 w-8 p-0'
@@ -232,8 +240,8 @@ export function EarningsGraph() {
         <div className='flex-1 min-h-[120px]'>
           <ResponsiveContainer width='100%' height='100%'>
             <LineChart data={earningsData}>
-              <XAxis 
-                dataKey='month' 
+              <XAxis
+                dataKey='month'
                 axisLine={false}
                 tickLine={false}
                 tick={{ fontSize: 12, fill: '#6b7280' }}

@@ -20,6 +20,18 @@ export function MonthlyReport() {
   const [error, setError] = React.useState<string | null>(null);
   const [reportData, setReportData] = React.useState<any>(null);
 
+  const months = React.useMemo(() => {
+    const options = [];
+    const today = new Date();
+    for (let i = 0; i < 12; i++) {
+      const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
+      const value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      const label = d.toLocaleString('en-US', { month: 'short', year: 'numeric' });
+      options.push({ value, label });
+    }
+    return options;
+  }, []);
+
   // Initialize with current month
   React.useEffect(() => {
     const now = new Date();
@@ -32,7 +44,7 @@ export function MonthlyReport() {
       console.log('No month selected');
       return;
     }
-    
+
     setLoading(true);
     setError(null);
     setReportData(null);
@@ -44,16 +56,16 @@ export function MonthlyReport() {
         'Enrolled': 'enrolled'
       };
 
-      const segment = segmentMap[activeSegment] || 'earnings'; 
+      const segment = segmentMap[activeSegment] || 'earnings';
       console.log('Fetching report with:', { segment, month: selectedMonth });
-      
-      const response = await dashboardApiService.getMonthlyReport({ 
-        segment: segment, 
+
+      const response = await dashboardApiService.getMonthlyReport({
+        segment: segment,
         month: selectedMonth
       });
 
       console.log('Monthly Report Response:', response);
-             
+
       if (response && response.success && response.data) {
         setReportData(response.data);
       } else {
@@ -86,22 +98,22 @@ export function MonthlyReport() {
       };
 
       const segment = segmentMap[activeSegment] || 'earnings';
-      
-      const response = await dashboardApiService.getMonthlyReportDownload({ 
-        segment, 
-        month: selectedMonth 
+
+      const response = await dashboardApiService.getMonthlyReportDownload({
+        segment,
+        month: selectedMonth
       });
-      
+
       if (response.success && response.data) {
         const blob = response.data as any;
         const downloadUrl = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = downloadUrl;
-        
+
         // Generate filename based on segment and month
         const monthName = new Date(selectedMonth + '-01').toLocaleString('en-US', { month: 'short', year: 'numeric' });
         a.download = `${segment}_report_${monthName.replace(' ', '_')}.csv`;
-        
+
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -139,27 +151,27 @@ export function MonthlyReport() {
     }
 
     return [
-      { 
-        label: 'Total', 
-        value: formatNumber(reportData.totalPaymentTransactions || 0), 
+      {
+        label: 'Total',
+        value: formatNumber(reportData.totalPaymentTransactions || 0),
         color: 'bg-red-500',
         sublabel: 'Payment Transactions'
       },
-      { 
-        label: 'Topics', 
-        value: formatNumber(reportData.totalTopics || 0), 
+      {
+        label: 'Topics',
+        value: formatNumber(reportData.totalTopics || 0),
         color: 'bg-blue-500',
         sublabel: ''
       },
-      { 
-        label: 'Subscribed', 
-        value: formatNumber(reportData.totalSubscribed || 0), 
+      {
+        label: 'Subscribed',
+        value: formatNumber(reportData.totalSubscribed || 0),
         color: 'bg-purple-500',
         sublabel: ''
       },
-      { 
-        label: 'Enrolled', 
-        value: formatNumber(reportData.totalEnrolled || 0), 
+      {
+        label: 'Enrolled',
+        value: formatNumber(reportData.totalEnrolled || 0),
         color: 'bg-green-500',
         sublabel: ''
       }
@@ -235,16 +247,15 @@ export function MonthlyReport() {
               onChange={(e) => setSelectedMonth(e.target.value)}
               className='h-9 px-3 pr-8 rounded-md border border-input bg-background text-sm cursor-pointer'
             >
-              <option value='2025-12'>Dec 2025</option>
-              <option value='2025-11'>Nov 2025</option>
-              <option value='2025-10'>Oct 2025</option>
-              <option value='2025-09'>Sep 2025</option>
-              <option value='2025-08'>Aug 2025</option>
-              <option value='2025-07'>Jul 2025</option>
+              {months.map((month) => (
+                <option key={month.value} value={month.value}>
+                  {month.label}
+                </option>
+              ))}
             </select>
-            <Button 
-              variant='ghost' 
-              size='sm' 
+            <Button
+              variant='ghost'
+              size='sm'
               onClick={fetchReport}
               disabled={loading}
             >
@@ -260,11 +271,10 @@ export function MonthlyReport() {
             <button
               key={segment}
               onClick={() => setActiveSegment(segment)}
-              className={`flex-1 px-3 py-2 text-sm rounded-md transition-colors ${
-                activeSegment === segment
+              className={`flex-1 px-3 py-2 text-sm rounded-md transition-colors ${activeSegment === segment
                   ? 'bg-background text-red-600 shadow-sm'
                   : 'text-muted-foreground hover:text-foreground'
-              }`}
+                }`}
             >
               {segment}
             </button>
@@ -291,15 +301,15 @@ export function MonthlyReport() {
 
         {/* Generate Report Buttons */}
         <div className='flex gap-2'>
-          <Button 
-            className='flex-1 bg-purple-600 hover:bg-purple-700 text-white' 
+          <Button
+            className='flex-1 bg-purple-600 hover:bg-purple-700 text-white'
             onClick={fetchReport}
             disabled={loading}
           >
             {loading ? 'Generating...' : 'Generate Report'}
             <ArrowRight className='ml-2 h-4 w-4' />
           </Button>
-          <Button 
+          <Button
             variant='outline'
             onClick={handleDownloadCSV}
             disabled={loading}
