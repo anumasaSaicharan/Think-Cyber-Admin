@@ -1,5 +1,5 @@
 // API Base URL from environment variables
-export const API_BASE_URL = 'https://api.thinkcyber.info/api';
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://10.20.0.9:8082/api';
 
 // API Endpoints Constants - These are relative to the base URL
 export const API_ENDPOINTS = {
@@ -229,6 +229,34 @@ export const API_ENDPOINTS = {
         SEND_MULTIPLE: 'notifications/send-multiple',
         SUBSCRIBE_TOPIC: 'notifications/subscribe-topic',
         UNSUBSCRIBE_TOPIC: 'notifications/unsubscribe-topic',
+    },
+
+    // Questionary endpoints
+    QUESTIONARY: {
+        BASE: 'questionary',
+        BY_ID: (id: string | number) => `questionary/${id}`,
+        BY_CATEGORY: (categoryId: string | number) => `questionary/category/${categoryId}`,
+        CREATE: 'questionary',
+        UPDATE: (id: string | number) => `questionary/${id}`,
+        DELETE: (id: string | number) => `questionary/${id}`,
+        BULK_DELETE: 'questionary/bulk-delete',
+        GENERATE_AI: 'questionary/generate-ai',
+        SAVE_AI_KEY: 'questionary/save-ai-key',
+        APPROVE_BATCH: 'questionary/approve-batch',
+        UPLOAD_EXCEL: 'questionary/upload-excel',
+        DOWNLOAD_TEMPLATE: 'questionary/download-template',
+        STATS: 'questionary/stats',
+    },
+
+    // Assessment Configuration endpoints
+    ASSESSMENT_CONFIG: {
+        BASE: 'assessment-config',
+        BY_ID: (id: string | number) => `assessment-config/${id}`,
+        BY_CATEGORY: (categoryId: string | number) => `assessment-config/category/${categoryId}`,
+        TOGGLE: (id: string | number) => `assessment-config/${id}/toggle`,
+        BULK_TOGGLE: 'assessment-config/bulk-toggle',
+        SYNC_CATEGORIES: 'assessment-config/sync-categories',
+        STATS: 'assessment-config/stats',
     },
 } as const;
 

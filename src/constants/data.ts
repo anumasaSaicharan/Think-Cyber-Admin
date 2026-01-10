@@ -99,6 +99,18 @@ export const navItems: NavItem[] = [
         url: '/dashboard/masters/subscription-plans',
         icon: 'billing',
         shortcut: ['o', 'p']
+      },
+      {
+        title: 'Questionary',
+        url: '/dashboard/masters/questionary',
+        icon: 'clipboardList',
+        shortcut: ['q', 'u']
+      },
+      {
+        title: 'Assessment Management',
+        url: '/dashboard/masters/assessment-management',
+        icon: 'clipboardCheck',
+        shortcut: ['a', 'm']
       }
     ]
   },

@@ -38,6 +38,7 @@ export const authOptions: NextAuthOptions = {
   },
   session: {
     strategy: "jwt",
+    maxAge: 60 * 60, // 1 hour in seconds
   },
   secret: "6b7f8e2c9a1d4e5f3c2b8a7d9e0f1c4b",
   callbacks: {
@@ -53,5 +54,8 @@ export const authOptions: NextAuthOptions = {
       }
       return session;
     },
+  },
+  jwt: {
+    maxAge: 60 * 60, // 1 hour in seconds
   },
 };
