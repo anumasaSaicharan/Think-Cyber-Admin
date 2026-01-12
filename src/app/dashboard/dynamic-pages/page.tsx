@@ -63,12 +63,13 @@ export default function DynamicPagesPage() {
 
   const fetchPages = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/dynamic-pages`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+      if (!apiUrl) {
+        console.warn('API URL not configured');
+        setLoading(false);
+        return;
+      }
+      const response = await fetch(`${apiUrl}/dynamic-pages`);
 
       if (response.ok) {
         const data = await response.json();
@@ -88,12 +89,8 @@ export default function DynamicPagesPage() {
     if (!confirm('Are you sure you want to delete this page?')) return;
 
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/dynamic-pages/${id}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/dynamic-pages/${id}`, {
         method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
       });
 
       if (response.ok) {
@@ -110,12 +107,10 @@ export default function DynamicPagesPage() {
 
   const toggleActive = async (page: DynamicPage) => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/dynamic-pages/${page.id}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/dynamic-pages/${page.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           is_active: !page.is_active,
@@ -154,7 +149,7 @@ export default function DynamicPagesPage() {
               </CardDescription>
             </div>
             <Button
-              onClick={() => router.push('/dashboard/dynamic-pages/new')}
+              onClick={() => router.push('/dashboard/dynamic-pages/edit/new')}
               className="flex items-center gap-2"
             >
               <Plus className="h-4 w-4" />
@@ -183,7 +178,7 @@ export default function DynamicPagesPage() {
                 {searchTerm ? 'Try adjusting your search' : 'Get started by creating your first page'}
               </p>
               {!searchTerm && (
-                <Button onClick={() => router.push('/dashboard/dynamic-pages/new')}>
+                <Button onClick={() => router.push('/dashboard/dynamic-pages/edit/new')}>
                   <Plus className="h-4 w-4 mr-2" />
                   Create First Page
                 </Button>

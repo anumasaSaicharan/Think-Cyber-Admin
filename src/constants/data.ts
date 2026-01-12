@@ -161,6 +161,27 @@ export const navItems: NavItem[] = [
         shortcut: ['f', 'u']
       }
     ]
+  },
+  {
+    title: 'Dynamic Pages',
+    url: '#',
+    icon: 'fileCode',
+    shortcut: ['d', 'p'],
+    isActive: false,
+    items: [
+      {
+        title: 'All Pages',
+        url: '/dashboard/dynamic-pages',
+        icon: 'list',
+        shortcut: ['a', 'p']
+      },
+      {
+        title: 'Templates',
+        url: '/dashboard/dynamic-pages/templates',
+        icon: 'layout',
+        shortcut: ['t', 'm']
+      }
+    ]
   }
 ];
 

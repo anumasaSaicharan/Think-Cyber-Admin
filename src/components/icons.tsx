@@ -48,7 +48,10 @@ import {
   IconBell,
   IconDeviceMobile,
   IconClipboardList,
-  IconClipboardCheck
+  IconClipboardCheck,
+  IconFileCode,
+  IconLayout,
+  IconComponents
 } from '@tabler/icons-react';
 
 export type Icon = React.ComponentType<IconProps>;
@@ -106,5 +109,8 @@ export const Icons = {
   bell: IconBell,
   smartphone: IconDeviceMobile,
   clipboardList: IconClipboardList,
-  clipboardCheck: IconClipboardCheck
+  clipboardCheck: IconClipboardCheck,
+  fileCode: IconFileCode,
+  layout: IconLayout,
+  component: IconComponents
 };
